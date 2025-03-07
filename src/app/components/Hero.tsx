@@ -5,39 +5,47 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stage, useGLTF } from '@react-three/drei';
 import { Suspense } from 'react';
 
+
 function FennecModel() {
-  const { scene } = useGLTF('/fennec.glb');
+  const { scene } = useGLTF('/fennec/scene.gltf');
   return <primitive object={scene} />;
 }
 
+// Preload the model
+useGLTF.preload('/fennec/scene.gltf');
+
 const glowVariants = {
-  initial: { opacity: 0.5, scale: 0.8 },
+  initial: { opacity: 0, scale: 0.8 },
   animate: { 
     opacity: [0.5, 0.8, 0.5],
     scale: [0.8, 1.2, 0.8],
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut",
+      delay: 0.5
     }
   }
 };
 
-const floatingVariants = {
-  initial: { y: 0 },
-  animate: {
-    y: [-10, 10, -10],
+const contentVariants = {
+  initial: { 
+    opacity: 0,
+    y: 20
+  },
+  animate: { 
+    opacity: 1,
+    y: 0,
     transition: {
-      duration: 6,
-      repeat: Infinity,
-      ease: "easeInOut"
+      duration: 0.8,
+      delay: 1
     }
   }
 };
 
 export default function Hero() {
   return (
-    <div className="relative min-h-[90vh] flex items-center">
+    <div className="relative min-h-screen h-screen flex items-center pt-20">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1C] via-[#1a1f2c]/80 to-[#0A0F1C]" />
       
@@ -46,31 +54,34 @@ export default function Hero() {
         variants={glowVariants}
         initial="initial"
         animate="animate"
-        className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]"
+        className="absolute top-1/3 -left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px]"
       />
       <motion.div
         variants={glowVariants}
         initial="initial"
         animate="animate"
-        className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px]"
+        className="absolute bottom-1/3 -right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px]"
       />
       
       {/* Grid Pattern */}
-      <div 
-        className="absolute inset-0 opacity-20"
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.2 }}
+        transition={{ duration: 1, delay: 1 }}
+        className="absolute inset-0"
         style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }}
       />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
           {/* Left Content */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+            variants={contentVariants}
+            initial="initial"
+            animate="animate"
             className="text-left"
           >
             <motion.div
@@ -147,25 +158,26 @@ export default function Hero() {
           </motion.div>
 
           {/* Right Content - 3D Model */}
-          <motion.div
-            variants={floatingVariants}
-            initial="initial"
-            animate="animate"
-            className="relative hidden lg:block h-[600px]"
-          >
+          <div className="relative hidden lg:block h-[600px]">
             <div className="absolute inset-0">
               <div className="relative w-full h-full">
                 <motion.div
-                  animate={{
-                    rotate: [0, 360],
-                    transition: { duration: 20, repeat: Infinity, ease: "linear" }
-                  }}
-                  className="absolute inset-0 border-2 border-dashed border-blue-500/20 rounded-full"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 via-transparent to-purple-500/10 rounded-full" />
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                >
+                  <motion.div
+                    animate={{
+                      rotate: [0, 360],
+                      transition: { duration: 20, repeat: Infinity, ease: "linear" }
+                    }}
+                    className="absolute inset-0 border-2 border-dashed border-blue-500/20 rounded-full"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 via-transparent to-purple-500/10 rounded-full" />
+                </motion.div>
                 
                 {/* 3D Model Canvas */}
-                <Canvas shadows camera={{ position: [0, 0, 5], fov: 45 }}>
+                <Canvas shadows>
                   <Suspense fallback={null}>
                     <Stage environment="city" intensity={0.6}>
                       <FennecModel />
@@ -182,7 +194,7 @@ export default function Hero() {
                 </Canvas>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
