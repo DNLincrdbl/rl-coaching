@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stage, useGLTF } from '@react-three/drei';
 import { Suspense } from 'react';
 
-
+{/*
 function FennecModel() {
   const { scene } = useGLTF('/fennec/scene.gltf');
   return <primitive object={scene} />;
@@ -13,6 +13,7 @@ function FennecModel() {
 
 // Preload the model
 useGLTF.preload('/fennec/scene.gltf');
+*/}
 
 const glowVariants = {
   initial: { opacity: 0, scale: 0.8 },
@@ -176,7 +177,7 @@ export default function Hero() {
                   <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 via-transparent to-purple-500/10 rounded-full" />
                 </motion.div>
                 
-                {/* 3D Model Canvas */}
+                {/* 3D Model Canvas 
                 <Canvas shadows>
                   <Suspense fallback={null}>
                     <Stage environment="city" intensity={0.6}>
@@ -192,6 +193,7 @@ export default function Hero() {
                     />
                   </Suspense>
                 </Canvas>
+                */}
               </div>
             </div>
           </div>
