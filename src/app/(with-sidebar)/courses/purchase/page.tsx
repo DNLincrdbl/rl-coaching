@@ -780,7 +780,6 @@ const ranks = [
 
 export default function PurchaseCourses() {
   const [expandedRank, setExpandedRank] = useState<string | null>(null);
-  const [selectedRank, setSelectedRank] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all');
   const { addItem, items } = useCart();
 

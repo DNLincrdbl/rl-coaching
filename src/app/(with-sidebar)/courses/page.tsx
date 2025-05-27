@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaFilter, FaSearch, FaPlay, FaShoppingCart } from 'react-icons/fa';
+import { FaSearch, FaPlay, FaShoppingCart } from 'react-icons/fa';
 import Link from 'next/link';
 
 const mockCourses = [

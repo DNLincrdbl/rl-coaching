@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaExpand } from 'react-icons/fa';
 
@@ -17,7 +17,17 @@ export default function VideoPlayer({ videoUrl, title, description, thumbnailUrl
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showControls, setShowControls] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const togglePlay = useCallback(() => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  }, [isPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -42,18 +52,7 @@ export default function VideoPlayer({ videoUrl, title, description, thumbnailUrl
       video.removeEventListener('timeupdate', handleTimeUpdate);
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, []);
-
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+  }, [togglePlay]);
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -65,10 +64,8 @@ export default function VideoPlayer({ videoUrl, title, description, thumbnailUrl
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       videoRef.current?.parentElement?.requestFullscreen();
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
 

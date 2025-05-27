@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaPlay, FaCheck, FaLock, FaTrophy, FaClock, FaBook, FaChartLine } from 'react-icons/fa';
+import { FaPlay, FaCheck, FaClock, FaBook, FaChartLine } from 'react-icons/fa';
+import Image from 'next/image';
 import VideoPlayer from './VideoPlayer';
 import Link from 'next/link';
 
@@ -108,10 +109,11 @@ export default function MyCourses() {
                 onClick={() => setSelectedCourse(course.id)}
               >
                 <div className="aspect-video bg-gray-800 rounded-lg mb-4 overflow-hidden relative group">
-                  <img
+                  <Image
                     src={course.thumbnailUrl}
                     alt={course.title}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
@@ -195,10 +197,11 @@ export default function MyCourses() {
                         onClick={() => setSelectedVideo(video.id)}
                       >
                         <div className="relative w-32 h-20 bg-gray-800 rounded-lg overflow-hidden group">
-                          <img
+                          <Image
                             src={video.thumbnailUrl}
                             alt={video.title}
-                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            fill
+                            className="object-cover transition-transform group-hover:scale-105"
                           />
                           {video.isCompleted && (
                             <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">

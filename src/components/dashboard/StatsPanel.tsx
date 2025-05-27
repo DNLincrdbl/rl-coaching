@@ -14,7 +14,7 @@ import {
   Legend,
   ChartData
 } from 'chart.js';
-import { FaClock, FaTrophy, FaChartLine, FaGamepad, FaCalendar } from 'react-icons/fa';
+import { FaClock, FaTrophy, FaChartLine, FaGamepad } from 'react-icons/fa';
 
 // Regisztráljuk a Chart.js komponenseket
 ChartJS.register(
@@ -195,7 +195,6 @@ export default function StatsPanel() {
   };
 
   const getRankStyle = (rank: RankKey) => {
-    const isGC = rank.includes('Grand Champion');
     return {
       optionClass: `${rankMMRValues[rank].textColor} font-semibold`,
       iconClass: `bg-gradient-to-br ${rankMMRValues[rank].color}`,

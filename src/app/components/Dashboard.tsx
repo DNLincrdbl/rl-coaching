@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaChartLine, FaCalendar, FaPlayCircle, FaBook } from 'react-icons/fa';
+import { FaTrophy, FaCalendar, FaPlayCircle, FaBook } from 'react-icons/fa';
 import Link from 'next/link';
 
 // Példa felhasználói adatok (később API-ból jönne)

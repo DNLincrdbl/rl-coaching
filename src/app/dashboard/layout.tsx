@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { FaChartLine, FaGamepad, FaVideo, FaBook, FaCog } from 'react-icons/fa';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

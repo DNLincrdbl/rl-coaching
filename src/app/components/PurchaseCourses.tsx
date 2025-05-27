@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FaTrophy, FaRocket, FaChartLine, FaUsers, FaCheck, FaCrown, 
+  FaTrophy, FaRocket, FaChartLine, FaUsers, FaCrown, 
   FaDiscord, FaVideo, FaClipboard, FaLightbulb, FaChalkboardTeacher,
   FaUserFriends, FaClock, FaStar
 } from 'react-icons/fa';

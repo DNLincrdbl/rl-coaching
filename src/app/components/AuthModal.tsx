@@ -34,8 +34,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
         await signUp(formData.email, formData.password, formData.name);
       }
       onLoginSuccess();
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Ismeretlen hiba történt');
     } finally {
       setLoading(false);
     }
@@ -48,8 +48,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
     try {
       await signInWithGoogle();
       onLoginSuccess();
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Ismeretlen hiba történt');
     } finally {
       setLoading(false);
     }

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaChartLine, FaCalendar, FaPlayCircle, FaBook } from 'react-icons/fa';
+import { FaPlayCircle, FaBook } from 'react-icons/fa';
 import Link from 'next/link';
 import StatsPanel from '@/components/dashboard/StatsPanel';
 import SkillTracker from '@/components/dashboard/SkillTracker';
