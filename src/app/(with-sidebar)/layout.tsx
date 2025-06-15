@@ -13,16 +13,6 @@ const menuItems = [
     href: '/dashboard',
   },
   {
-    icon: FaGamepad,
-    label: 'Játék',
-    href: '/dashboard/play',
-  },
-  {
-    icon: FaVideo,
-    label: 'Replay Elemzés',
-    href: '/dashboard/replays',
-  },
-  {
     icon: FaBook,
     label: 'Kurzusok',
     href: '/courses',
