@@ -31,7 +31,7 @@ const rocketLeagueServices = [
     name: 'Közös Játék',
     description: 'Játssz velem és tanulj közben',
     price: 'Óránként',
-    icon: '/icons/Ikon Közös Játék.jpg',
+    icon: '/icons/icon_play_together.jpg',
     color: 'from-green-500 to-blue-500',
     isPremium: false,
     features: ['Gyakorlati tapasztalat', 'Valós idejű tanácsok', 'Csapatmunka', 'Stratégiai fejlődés']
@@ -41,7 +41,7 @@ const rocketLeagueServices = [
     name: 'Replay Elemzés',
     description: 'Részletes játék elemzés videóval',
     price: 'Elemzésenként',
-    icon: '/icons/Ikon Replay Elemzés.jpg',
+    icon: '/icons/icon_elemzes.jpg',
     color: 'from-purple-500 to-pink-500',
     isPremium: false,
     features: ['Videó elemzés', 'Írásbeli feedback', 'Fejlődési javaslatok', 'Gyakorlatok']
@@ -108,7 +108,7 @@ export default function Shop() {
               Rocket League
             </motion.h3>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {rocketLeagueServices.map((service, index) => (
                 <motion.div
                   key={service.id}
@@ -116,10 +116,10 @@ export default function Shop() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className={`relative p-6 rounded-2xl backdrop-blur-lg border transition-all duration-300 ease-out cursor-pointer group hover:scale-105 hover:-translate-y-1 hover:shadow-xl ${
+                  className={`relative p-8 rounded-2xl backdrop-blur-lg border transition-transform duration-600 ease-in-out cursor-pointer group hover:scale-[1.02] hover:-translate-y-1 flex flex-col h-96 ${
                     service.isPremium 
-                      ? 'bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-200/50 dark:border-orange-500/20 hover:border-orange-300/50'
-                      : 'bg-white/10 dark:bg-white/5 border-gray-200/50 dark:border-white/10 hover:border-gray-300/50'
+                      ? 'bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-200/50 dark:border-orange-500/20 hover:border-orange-300/50 hover:from-orange-500/20 hover:to-red-500/20'
+                      : 'bg-white/10 dark:bg-white/5 border-gray-200/50 dark:border-white/10 hover:border-gray-300/50 hover:bg-white/20 dark:hover:bg-white/10'
                   }`}
                   onClick={() => setActiveTab(service.id)}
                 >
@@ -129,21 +129,23 @@ export default function Shop() {
                     </div>
                   )}
                   
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden mb-4 mx-auto border-2 border-gray-200/50 dark:border-white/10">
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden mb-6 mx-auto border-2 border-gray-200/50 dark:border-white/10 transition-all duration-500 ease-out group-hover:scale-110 group-hover:border-gray-300/70 dark:group-hover:border-white/30">
                     <Image
                       src={service.icon}
                       alt={service.name}
-                      width={80}
-                      height={80}
-                      className="w-full h-full object-cover"
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105"
                     />
                   </div>
                   
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                  <h4 className={`font-bold text-gray-900 dark:text-white mb-3 text-center ${
+                    service.id === 'rlm' ? 'text-lg' : 'text-xl'
+                  }`}>
                     {service.name}
                   </h4>
                   
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 text-center">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 text-center flex-grow">
                     {service.description}
                   </p>
                   
@@ -153,7 +155,7 @@ export default function Shop() {
                     </span>
                   </div>
                   
-                  <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all">
+                  <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02] hover:from-blue-600 hover:to-purple-600 transition-all duration-500 ease-out mt-auto">
                     Részletek
                   </button>
                 </motion.div>
@@ -175,7 +177,7 @@ export default function Shop() {
               Egyéb
             </motion.h3>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
               {otherServices.map((service, index) => (
                 <motion.div
                   key={service.id}
@@ -183,18 +185,18 @@ export default function Shop() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl backdrop-blur-lg border border-gray-200/50 dark:border-white/10 hover:border-gray-300/50 transition-all cursor-pointer group hover:scale-105"
+                  className="p-8 rounded-2xl backdrop-blur-lg border border-gray-200/50 dark:border-white/10 hover:border-gray-300/50 transition-transform duration-600 ease-in-out cursor-pointer group hover:scale-[1.02] hover:-translate-y-1 flex flex-col h-96 hover:bg-white/20 dark:hover:bg-white/10"
                   onClick={() => setActiveTab(service.id)}
                 >
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${service.color} flex items-center justify-center mb-4 mx-auto`}>
-                    <service.icon className="w-10 h-10 text-white" />
+                  <div className={`w-24 h-24 rounded-2xl bg-gradient-to-r ${service.color} flex items-center justify-center mb-6 mx-auto transition-all duration-500 ease-out group-hover:scale-110 group-hover:shadow-lg`}>
+                    <service.icon className="w-12 h-12 text-white transition-all duration-500 ease-out group-hover:scale-110" />
                   </div>
                   
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-3 text-center">
                     {service.name}
                   </h4>
                   
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 text-center">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 text-center flex-grow">
                     {service.description}
                   </p>
                   
@@ -204,7 +206,7 @@ export default function Shop() {
                     </span>
                   </div>
                   
-                  <button className="w-full py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-green-500/25 transition-all">
+                  <button className="w-full py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl font-medium hover:shadow-2xl hover:shadow-green-500/40 hover:scale-[1.02] hover:from-green-600 hover:to-teal-600 transition-all duration-500 ease-out mt-auto">
                     Részletek
                   </button>
                 </motion.div>
