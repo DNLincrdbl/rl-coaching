@@ -12,15 +12,46 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Light mode (default) */
+body {
+  background: #ffffff;
+  color: #171717;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden; /* Remove horizontal scrollbar */
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Dark mode */
+.dark body {
+  background: #0A0F1C;
+  color: #ffffff;
+}
+
+/* Remove horizontal scrollbar globally */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure no horizontal overflow on any element */
+* {
+  box-sizing: border-box;
+}
+
+/* Allow vertical scrolling, only prevent horizontal */
+html, body {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* System preference support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0A0F1C;
+    --foreground: #ffffff;
+  }
 }

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import AuthModal from './AuthModal';
 import { FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -23,7 +24,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed w-full z-50 bg-[#0A0F1C]/80 backdrop-blur-md border-b border-white/5">
+      <nav className="fixed w-full z-50 bg-white/80 dark:bg-[#0A0F1C]/80 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <Link 
@@ -36,19 +37,19 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-8">
               <Link 
                 href="#about" 
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Rólam
               </Link>
               <Link 
-                href="#courses" 
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                href="#shop" 
+                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Kurzusok
               </Link>
               <Link 
                 href="#contact" 
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Kapcsolat
               </Link>
@@ -91,14 +92,17 @@ const Navbar = () => {
                   )}
                 </div>
               ) : (
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="ml-8 px-6 py-2.5 bg-white/10 rounded-lg text-sm font-medium hover:bg-white/20 transition-all"
-                >
-                  Bejelentkezés
-                </motion.button>
+                <div className="flex items-center gap-4">
+                  <ThemeToggle />
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="px-6 py-2.5 bg-white/10 rounded-lg text-sm font-medium hover:bg-white/20 transition-all"
+                  >
+                    Bejelentkezés
+                  </motion.button>
+                </div>
               )}
             </div>
           </div>

@@ -2,41 +2,17 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { FaTrophy, FaChartLine, FaUsers } from 'react-icons/fa';
-
-const achievements = [
-  {
-    icon: FaTrophy,
-    title: "Grand Champion",
-    description: "Több szezonon keresztül",
-    color: "text-red-400",
-    bgColor: "bg-red-400/10"
-  },
-  {
-    icon: FaChartLine,
-    title: "5+ év tapasztalat",
-    description: "Folyamatos fejlődés",
-    color: "text-blue-400",
-    bgColor: "bg-blue-400/10"
-  },
-  {
-    icon: FaUsers,
-    title: "100+ tanuló",
-    description: "Elégedett játékosok",
-    color: "text-purple-400",
-    bgColor: "bg-purple-400/10"
-  }
-];
+import Link from 'next/link';
 
 export default function About() {
   return (
     <section id="about" className="py-32 relative">
       {/* Decorative Elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-100/50 dark:via-blue-500/5 to-transparent" />
       <div 
         className="absolute inset-0 opacity-10"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, ${typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? 'white' : 'gray'} 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }}
       />
@@ -53,16 +29,17 @@ export default function About() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="text-blue-400 font-medium tracking-wider uppercase text-sm mb-4 block"
+              className="text-blue-600 dark:text-blue-400 font-medium tracking-wider uppercase text-sm mb-4 block"
             >
               Ismerd meg az oktatód
             </motion.span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-gray-900 via-gray-600 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
               Rólam
             </h2>
           </div>
           
           <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* Left - Image with Fennec preset */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -70,28 +47,42 @@ export default function About() {
               className="relative"
             >
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
-                <Image
-                  src="/profile.jpg"
-                  alt="JusTZoly"
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1C] via-transparent to-transparent opacity-60" />
+                {/* Placeholder for the image */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl border-2 border-dashed border-blue-500/30 dark:border-blue-500/20">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center text-gray-600 dark:text-gray-400">
+                      <div className="text-6xl mb-4">📸🎮</div>
+                      <p className="text-lg font-medium">Profile Image</p>
+                      <p className="text-sm">Karba tett kézzel a kamerába nézek</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 dark:from-[#0A0F1C]/60 via-transparent to-transparent opacity-60" />
               </div>
               
-              {/* Floating Stats */}
+              {/* Fennec preset below */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
-                className="absolute -bottom-8 -right-8 bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 shadow-xl"
+                className="mt-6 p-4 rounded-2xl bg-gray-100/80 dark:bg-white/5 backdrop-blur-lg border border-gray-200/50 dark:border-white/10"
               >
-                <div className="text-3xl font-bold text-blue-400">2000+</div>
-                <div className="text-sm text-gray-400">Játszott óra</div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">F</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Main Fennec Preset</h4>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div>Primary: <span className="font-medium">Orange</span></div>
+                  <div>Accent: <span className="font-medium">Blue</span></div>
+                  <div>Wheels: <span className="font-medium">Dieci</span></div>
+                </div>
               </motion.div>
             </motion.div>
             
+            {/* Right - Story */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -102,37 +93,27 @@ export default function About() {
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                   Grand Champion Oktató
                 </h3>
-                <p className="text-gray-400 leading-relaxed text-lg">
-                  Szia! JusTZoly vagyok, és több mint 5 éve élek-halok a Rocket League-ért. 
-                  Grand Champion rangom mellett a legnagyobb szenvedélyem az, hogy másoknak 
-                  átadjam a tudásom.
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
+                  15 évesen kezdtem el játszani a Rocket League-el és már az elején láttam, hogy nincs ehhez a játékhoz hasonló. Beszippantott. Minden szabadidőmet erre fordítottam. Élveztem a kihívást amit nyújtott és azt, hogy hónapról hónapra egyre jobb vagyok.
                 </p>
-                <p className="text-gray-400 leading-relaxed text-lg">
-                  Eddigi tapasztalataim során számos játékosnak segítettem fejlődni, 
-                  a bronz rangtól egészen a champion szintig. Személyre szabott 
-                  edzéstervekkel és részletes visszajelzésekkel garantálom a fejlődésed.
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
+                  Sok-sok év és elszánt gyakorlás után elértem a legmagasabb rangot a játékban. Ez az időszak egy fontos dologra tanított meg: <strong>A konzisztens, kemény munkának látszódni fog az eredménye.</strong> Viszont nem mindig volt ez egyszerű. Számtalan nehézséggel küzdöttem meg az utam során, ennek hatására pedig létrehoztam egy programot, ami megkönnyíti a fejlődésed: <Link href="#shop" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Rocket League Mesterfokon</Link>.
                 </p>
               </div>
 
-              {/* Achievements */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8">
-                {achievements.map((achievement, index) => (
-                  <motion.div
-                    key={achievement.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.2 }}
-                    className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all group"
-                  >
-                    <div className={`${achievement.bgColor} w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                      <achievement.icon className={`w-6 h-6 ${achievement.color}`} />
-                    </div>
-                    <h4 className="text-lg font-semibold text-white mb-1">{achievement.title}</h4>
-                    <p className="text-sm text-gray-400">{achievement.description}</p>
-                  </motion.div>
-                ))}
-              </div>
+              {/* Experience badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="inline-flex items-center gap-3 px-6 py-3 bg-blue-100 dark:bg-blue-500/10 rounded-full border border-blue-200/50 dark:border-blue-500/20"
+              >
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">5+</span>
+                </div>
+                <span className="text-blue-700 dark:text-blue-300 font-medium">Év tapasztalat</span>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>

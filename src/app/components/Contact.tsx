@@ -37,14 +37,14 @@ export default function Contact() {
   return (
     <section id="contact" className="py-32 relative">
       {/* Decorative elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
-      <div 
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }}
-      />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-100/50 dark:via-purple-500/5 to-transparent" />
+             <div 
+         className="absolute inset-0 opacity-10"
+         style={{
+           backgroundImage: `radial-gradient(circle at 1px 1px, ${typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? 'white' : 'gray'} 1px, transparent 0)`,
+           backgroundSize: '40px 40px'
+         }}
+       />
 
       <div className="container mx-auto px-4 relative">
         <div className="max-w-4xl mx-auto">
@@ -53,14 +53,14 @@ export default function Contact() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="text-blue-400 font-medium tracking-wider uppercase text-sm mb-4 block"
+              className="text-blue-600 dark:text-blue-400 font-medium tracking-wider uppercase text-sm mb-4 block"
             >
               Lépj kapcsolatba
             </motion.span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-gray-900 via-gray-600 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
               Kezdjük el a közös munkát
             </h2>
-            <p className="mt-6 text-gray-400 text-lg max-w-2xl mx-auto">
+            <p className="mt-6 text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
               Válaszd ki a számodra legkényelmesebb kapcsolatfelvételi módot, és kezdjük el közösen a fejlődésed útját.
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function Contact() {
                 <div className="flex flex-col items-center text-center">
                   <method.icon className="w-12 h-12 mb-4 opacity-90 group-hover:opacity-100 transition-opacity" />
                   <h3 className="text-xl font-bold mb-2">{method.name}</h3>
-                  <p className="text-sm text-gray-300">{method.description}</p>
+                                     <p className="text-sm text-gray-100 dark:text-gray-300">{method.description}</p>
                 </div>
               </motion.a>
             ))}
@@ -91,9 +91,9 @@ export default function Contact() {
             viewport={{ once: true }}
             className="mt-16 text-center"
           >
-            <p className="text-gray-400">
-              Általában <span className="text-white font-medium">24 órán belül</span> válaszolok
-            </p>
+                         <p className="text-gray-600 dark:text-gray-400">
+               Általában <span className="text-gray-900 dark:text-white font-medium">24 órán belül</span> válaszolok
+             </p>
           </motion.div>
         </div>
       </div>
