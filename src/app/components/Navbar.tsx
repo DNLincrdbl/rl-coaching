@@ -12,6 +12,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -34,6 +35,23 @@ const Navbar = () => {
               JusTZoly
             </Link>
             
+            {/* Mobile controls */}
+            <div className="flex items-center gap-3 md:hidden">
+              <ThemeToggle />
+              <button
+                aria-label="Menü megnyitása"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                <span className="sr-only">Menu</span>
+                <div className="relative w-6 h-6 text-current">
+                  <span className={`absolute left-0 top-1 block h-0.5 w-6 bg-current transition-transform ${isMobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
+                  <span className={`absolute left-0 top-3 block h-0.5 w-6 bg-current transition-opacity ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
+                  <span className={`absolute left-0 top-5 block h-0.5 w-6 bg-current transition-transform ${isMobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
+                </div>
+              </button>
+            </div>
+
             <div className="hidden md:flex items-center space-x-8">
               <Link 
                 href="#about" 
@@ -109,6 +127,33 @@ const Navbar = () => {
         </div>
       </nav>
 
+      {/* Mobile menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed top-20 inset-x-0 z-40 bg-white/90 dark:bg-[#0A0F1C]/90 backdrop-blur border-b border-gray-200/50 dark:border-white/10">
+          <div className="container mx-auto px-4 py-4 space-y-2">
+            <Link href="#about" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
+              Rólam
+            </Link>
+            <Link href="#shop" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
+              Kurzusok
+            </Link>
+            <Link href="#contact" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
+              Kapcsolat
+            </Link>
+            <div className="pt-2">
+              {user ? (
+                <button onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} className="w-full px-3 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-white/5 flex items-center gap-2">
+                  <FaSignOutAlt className="w-4 h-4" /> Kijelentkezés
+                </button>
+              ) : (
+                <button onClick={() => { setIsMobileMenuOpen(false); setIsAuthModalOpen(true); }} className="w-full px-3 py-3 rounded-lg text-sm font-medium bg-white/10 hover:bg-white/20">
+                  Bejelentkezés
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)}

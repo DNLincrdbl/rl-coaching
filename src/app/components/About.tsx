@@ -46,18 +46,18 @@ export default function About() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
-                {/* Placeholder for the image */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl border-2 border-dashed border-blue-500/30 dark:border-blue-500/20">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-gray-600 dark:text-gray-400">
-                      <div className="text-6xl mb-4">📸🎮</div>
-                      <p className="text-lg font-medium">Profile Image</p>
-                      <p className="text-sm">Karba tett kézzel a kamerába nézek</p>
-                    </div>
-                  </div>
+              <div className="relative rounded-3xl bg-white/70 dark:bg-white/5 border border-gray-200/60 dark:border-white/10 shadow-xl backdrop-blur">
+                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-gradient-to-br from-blue-500/10 to-purple-500/10">
+                  <Image
+                    src="/zoli/zoli2.png"
+                    alt="JusTZoly - portré"
+                    fill
+                    className="object-contain object-center"
+                    priority
+                  />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 dark:from-[#0A0F1C]/60 via-transparent to-transparent opacity-60" />
+                {/* subtle bottom glow */}
+                <div className="absolute -inset-x-2 -bottom-2 h-6 bg-gradient-to-t from-blue-500/15 to-transparent blur-md" />
               </div>
               
               {/* Fennec preset below */}

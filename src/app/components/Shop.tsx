@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import Image from 'next/image';
 import { FaDumbbell } from 'react-icons/fa';
 
@@ -62,7 +61,7 @@ const otherServices = [
 ];
 
 export default function Shop() {
-  const [activeTab, setActiveTab] = useState('rlm');
+  const isSingleOther = otherServices.length === 1;
 
   return (
     <section id="shop" className="py-32 relative">
@@ -121,7 +120,6 @@ export default function Shop() {
                       ? 'bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-200/50 dark:border-orange-500/20 hover:border-orange-300/50 hover:from-orange-500/20 hover:to-red-500/20'
                       : 'bg-white/10 dark:bg-white/5 border-gray-200/50 dark:border-white/10 hover:border-gray-300/50 hover:bg-white/20 dark:hover:bg-white/10'
                   }`}
-                  onClick={() => setActiveTab(service.id)}
                 >
                   {service.isPremium && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1 rounded-full text-sm font-medium">
@@ -177,7 +175,7 @@ export default function Shop() {
               Egyéb
             </motion.h3>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className={`${isSingleOther ? 'flex justify-center' : 'grid md:grid-cols-2 lg:grid-cols-3'} gap-8 max-w-4xl mx-auto`}>
               {otherServices.map((service, index) => (
                 <motion.div
                   key={service.id}
@@ -186,7 +184,6 @@ export default function Shop() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   className="p-8 rounded-2xl backdrop-blur-lg border border-gray-200/50 dark:border-white/10 hover:border-gray-300/50 transition-transform duration-600 ease-in-out cursor-pointer group hover:scale-[1.02] hover:-translate-y-1 flex flex-col h-96 hover:bg-white/20 dark:hover:bg-white/10"
-                  onClick={() => setActiveTab(service.id)}
                 >
                   <div className={`w-24 h-24 rounded-2xl bg-gradient-to-r ${service.color} flex items-center justify-center mb-6 mx-auto transition-all duration-500 ease-out group-hover:scale-110 group-hover:shadow-lg`}>
                     <service.icon className="w-12 h-12 text-white transition-all duration-500 ease-out group-hover:scale-110" />

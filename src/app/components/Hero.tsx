@@ -81,13 +81,13 @@ export default function Hero() {
        />
 
       <div className="container mx-auto px-4 relative z-10 h-full flex items-center">
-        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <div className="grid lg:grid-cols-2 gap-12 items-start w-full">
           {/* Left Content */}
           <motion.div
             variants={contentVariants}
             initial="initial"
             animate="animate"
-            className="text-left"
+            className="text-left pt-32"
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -138,7 +138,7 @@ export default function Hero() {
           </motion.div>
 
           {/* Right Content - Zoli's Image */}
-          <div className="relative hidden lg:block h-[500px] flex items-center justify-center">
+          <div className="relative hidden lg:block flex items-start justify-center pt-32">
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -171,11 +171,11 @@ export default function Hero() {
                  className="absolute inset-2 w-64 h-64 border border-purple-500/20 dark:border-purple-500/10 rounded-full -z-5"
                />
               
-               {/* Floating elements - better positioned */}
+               {/* Floating elements - closer to the image */}
                <motion.div
                  animate={{ y: [-4, 4, -4] }}
                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                 className="absolute -top-1 -right-1 w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg"
+                 className="absolute top-2 right-2 w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg"
                >
                  <span className="text-white text-lg">🎮</span>
                </motion.div>
@@ -183,7 +183,7 @@ export default function Hero() {
                <motion.div
                  animate={{ y: [4, -4, 4] }}
                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                 className="absolute -bottom-1 -left-1 w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg"
+                 className="absolute bottom-4 left-4 w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg"
                >
                  <span className="text-white text-lg">💪</span>
                </motion.div>

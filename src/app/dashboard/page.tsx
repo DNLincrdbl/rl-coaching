@@ -81,7 +81,7 @@ export default function DashboardPage() {
       <div className="bg-white/5 rounded-xl p-6 shadow-md">
         <h2 className="text-xl font-semibold text-white mb-4">Napi Küldetések</h2>
         <ul className="space-y-2">
-          {challenges.map((c, idx) => (
+          {challenges.map((c) => (
             <li
               key={c.id}
               className={`group flex items-center justify-between px-3 py-2 rounded-full transition-colors border border-white/10 shadow-sm backdrop-blur-md ${

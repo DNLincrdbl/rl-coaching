@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FaChartLine, FaGamepad, FaVideo, FaBook, FaCog } from 'react-icons/fa';
+import { FaChartLine, FaBook, FaCog } from 'react-icons/fa';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ProfileMenu from '@/components/dashboard/ProfileMenu';
