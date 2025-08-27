@@ -63,7 +63,7 @@ const Navbar = () => {
                 href="#shop" 
                 className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
-                Kurzusok
+                Digitális termékek
               </Link>
               <Link 
                 href="#contact" 
@@ -135,7 +135,7 @@ const Navbar = () => {
               Rólam
             </Link>
             <Link href="#shop" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
-              Kurzusok
+              Digitális termékek
             </Link>
             <Link href="#contact" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
               Kapcsolat

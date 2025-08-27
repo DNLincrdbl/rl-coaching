@@ -134,8 +134,8 @@ export default function Health() {
                   <div className="text-xs text-gray-600 dark:text-gray-400">Zsír</div>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-gray-100/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10">
-                  <div className="text-lg font-bold text-purple-600 dark:text-purple-400 mb-0.5">+100%</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Energia</div>
+                  <div className="text-lg font-bold text-purple-600 dark:text-purple-400 mb-0.5">2 év</div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">alatt</div>
                 </div>
               </motion.div>
             </motion.div>

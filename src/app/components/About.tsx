@@ -97,7 +97,7 @@ export default function About() {
                   15 évesen kezdtem el játszani a Rocket League-el és már az elején láttam, hogy nincs ehhez a játékhoz hasonló. Beszippantott. Minden szabadidőmet erre fordítottam. Élveztem a kihívást amit nyújtott és azt, hogy hónapról hónapra egyre jobb vagyok.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  Sok-sok év és elszánt gyakorlás után elértem a legmagasabb rangot a játékban. Ez az időszak egy fontos dologra tanított meg: <strong>A konzisztens, kemény munkának látszódni fog az eredménye.</strong> Viszont nem mindig volt ez egyszerű. Számtalan nehézséggel küzdöttem meg az utam során, ennek hatására pedig létrehoztam egy programot, ami megkönnyíti a fejlődésed: <Link href="#shop" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Rocket League Mesterfokon</Link>.
+                  Sok-sok év és elszánt gyakorlás után elértem a legmagasabb rangot a játékban. Ez az időszak egy fontos dologra tanított meg: <strong>A konzisztens, kemény munkának látszódni fog az eredménye.</strong> Viszont nem mindig volt ez egyszerű. Számtalan nehézséggel küzdöttem meg az utam során, ennek hatására pedig létrehoztam egy programot, ami megkönnyíti a fejlődésed: <Link href="/shop" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Rocket League Mesterfokon</Link>.
                 </p>
               </div>
 
@@ -110,7 +110,7 @@ export default function About() {
                 className="inline-flex items-center gap-3 px-6 py-3 bg-blue-100 dark:bg-blue-500/10 rounded-full border border-blue-200/50 dark:border-blue-500/20"
               >
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">5+</span>
+                  <span className="text-white text-sm font-bold">10+</span>
                 </div>
                 <span className="text-blue-700 dark:text-blue-300 font-medium">Év tapasztalat</span>
               </motion.div>
