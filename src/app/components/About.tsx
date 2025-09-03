@@ -60,26 +60,6 @@ export default function About() {
                 <div className="absolute -inset-x-2 -bottom-2 h-6 bg-gradient-to-t from-blue-500/15 to-transparent blur-md" />
               </div>
               
-              {/* Fennec preset below */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="mt-6 p-4 rounded-2xl bg-gray-100/80 dark:bg-white/5 backdrop-blur-lg border border-gray-200/50 dark:border-white/10"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">F</span>
-                  </div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Main Fennec Preset</h4>
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <div>Primary: <span className="font-medium">Orange</span></div>
-                  <div>Accent: <span className="font-medium">Blue</span></div>
-                  <div>Wheels: <span className="font-medium">Dieci</span></div>
-                </div>
-              </motion.div>
             </motion.div>
             
             {/* Right - Story */}
@@ -97,7 +77,7 @@ export default function About() {
                   15 évesen kezdtem el játszani a Rocket League-el és már az elején láttam, hogy nincs ehhez a játékhoz hasonló. Beszippantott. Minden szabadidőmet erre fordítottam. Élveztem a kihívást amit nyújtott és azt, hogy hónapról hónapra egyre jobb vagyok.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  Sok-sok év és elszánt gyakorlás után elértem a legmagasabb rangot a játékban. Ez az időszak egy fontos dologra tanított meg: <strong>A konzisztens, kemény munkának látszódni fog az eredménye.</strong> Viszont nem mindig volt ez egyszerű. Számtalan nehézséggel küzdöttem meg az utam során, ennek hatására pedig létrehoztam egy programot, ami megkönnyíti a fejlődésed: <Link href="/shop" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Rocket League Mesterfokon</Link>.
+                  Sok-sok év és elszánt gyakorlás után elértem a legmagasabb rangot a játékban. Ez az időszak egy fontos dologra tanított meg: <strong>A konzisztens, kemény munkának látszódni fog az eredménye.</strong> Viszont nem mindig volt ez egyszerű. Számtalan nehézséggel küzdöttem meg az utam során, ennek hatására pedig létrehoztam egy programot, ami megkönnyíti a fejlődésed: <Link href="#shop" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Rocket League Mesterfokon</Link>.
                 </p>
               </div>
 

@@ -23,17 +23,43 @@ const Navbar = () => {
     }
   };
 
+  const smoothScrollTo = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <>
       <nav className="fixed w-full z-50 bg-white/80 dark:bg-[#0A0F1C]/80 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
-            <Link 
-              href="/" 
-              className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text"
+            <button 
+              onClick={scrollToTop}
+              className="group relative"
             >
-              JusTZoly
-            </Link>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative"
+              >
+                <span className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text hover:from-cyan-300 hover:via-blue-400 hover:to-purple-500 transition-all duration-300">
+                  JusTZoly
+                </span>
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </motion.div>
+            </button>
             
             {/* Mobile controls */}
             <div className="flex items-center gap-3 md:hidden">
@@ -53,24 +79,24 @@ const Navbar = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <Link 
-                href="#about" 
+              <button 
+                onClick={() => smoothScrollTo('about')}
                 className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Rólam
-              </Link>
-              <Link 
-                href="#shop" 
+              </button>
+              <button 
+                onClick={() => smoothScrollTo('shop')}
                 className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Digitális termékek
-              </Link>
-              <Link 
-                href="#contact" 
+              </button>
+              <button 
+                onClick={() => smoothScrollTo('contact')}
                 className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Kapcsolat
-              </Link>
+              </button>
               
               {user ? (
                 <div className="relative">
@@ -131,15 +157,24 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden fixed top-20 inset-x-0 z-40 bg-white/90 dark:bg-[#0A0F1C]/90 backdrop-blur border-b border-gray-200/50 dark:border-white/10">
           <div className="container mx-auto px-4 py-4 space-y-2">
-            <Link href="#about" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
+            <button 
+              onClick={() => { smoothScrollTo('about'); setIsMobileMenuOpen(false); }}
+              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
+            >
               Rólam
-            </Link>
-            <Link href="#shop" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
+            </button>
+            <button 
+              onClick={() => { smoothScrollTo('shop'); setIsMobileMenuOpen(false); }}
+              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
+            >
               Digitális termékek
-            </Link>
-            <Link href="#contact" className="block px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setIsMobileMenuOpen(false)}>
+            </button>
+            <button 
+              onClick={() => { smoothScrollTo('contact'); setIsMobileMenuOpen(false); }}
+              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
+            >
               Kapcsolat
-            </Link>
+            </button>
             <div className="pt-2">
               {user ? (
                 <button onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} className="w-full px-3 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-white/5 flex items-center gap-2">
