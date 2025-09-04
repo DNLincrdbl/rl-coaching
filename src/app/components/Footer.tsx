@@ -13,8 +13,8 @@ const socialLinks = [
 ];
 
 const footerLinks = [
+  { name: 'Digitális termékek', href: '#shop' },
   { name: 'Rólam', href: '#about' },
-  { name: 'Kurzusok', href: '#shop' },
   { name: 'Egészség', href: '#health' },
   { name: 'Kapcsolat', href: '#contact' }
 ];
