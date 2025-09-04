@@ -38,9 +38,7 @@ export default function Footer() {
                 JusTZoly
               </Link>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
-                Professzionális Rocket League coaching szolgáltatás, 
-                személyre szabott fejlődési tervvel és részletes 
-                visszajelzésekkel.
+              Professzionális Rocket League coaching szolgáltatás, részletes visszajelzésekkel.
               </p>
               <div className="flex space-x-6">
                 {socialLinks.map((social) => (
