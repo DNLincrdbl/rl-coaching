@@ -2,12 +2,14 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaDiscord, FaSteam, FaYoutube } from 'react-icons/fa';
+import { FaDiscord, FaSteam, FaYoutube, FaTwitch, FaInstagram } from 'react-icons/fa';
 
 const socialLinks = [
-  { icon: FaDiscord, href: '#', label: 'Discord' },
+  { icon: FaYoutube, href: '#', label: 'YouTube' },
+  { icon: FaTwitch, href: '#', label: 'Twitch' },
+  { icon: FaInstagram, href: '#', label: 'Instagram' },
   { icon: FaSteam, href: '#', label: 'Steam' },
-  { icon: FaYoutube, href: '#', label: 'YouTube' }
+  { icon: FaDiscord, href: '#', label: 'Discord' }
 ];
 
 const footerLinks = [

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Health() {
@@ -56,7 +57,7 @@ export default function Health() {
                   A következő hónapokban beleástam magam abba, hogyan építhetek egy jobb, erősebb fizikumot. Miután elkezdtem edzeni és odafigyelni arra mit eszek, realizáltam, hogy <strong>a gamelés és az edzés nem is annyira különbözik</strong>. Mindkettőben ugyanaz a dolog fogott meg: A fejlődés.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  Lassan rájöttem, hogy mi effektív és mi nem. Kialakítottam egy rendszert, ami működött számomra, eredményeket hozott, és tudtam magam tartani hozzá. Megakarom mutatni, hogyan lehetsz otthonról te is egészséges és egy magas szintű gamer: <Link href="#shop" className="text-green-600 dark:text-green-400 hover:underline font-semibold">A JusTZoly Testsúly Program</Link>.
+                  Lassan rájöttem, hogy mi effektív és mi nem. Kialakítottam egy rendszert, ami működött számomra, eredményeket hozott, és tudtam magam tartani hozzá. Megakarom mutatni, hogyan lehetsz otthonról te is egészséges és egy magas szintű gamer: <Link href="#fitness" className="text-green-600 dark:text-green-400 hover:underline font-semibold cursor-pointer relative z-10">A JusTZoly Testsúly Program</Link>.
                 </p>
               </div>
 
@@ -90,15 +91,13 @@ export default function Health() {
               className="relative"
             >
               <div className="relative aspect-[4/3] rounded-xl overflow-hidden">
-                {/* Placeholder for before/after image */}
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-xl border-2 border-dashed border-green-500/30 dark:border-green-500/20">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-gray-600 dark:text-gray-400">
-                      <p className="text-sm font-medium">Before/After Image</p>
-                      <p className="text-xs">Fizikai fejlődés eredménye</p>
-                    </div>
-                  </div>
-                </div>
+                {/* Before/After image */}
+                <Image
+                  src="/testsulykep/hq720.jpg"
+                  alt="Fizikai fejlődés - Előtte és utána"
+                  fill
+                  className="object-cover"
+                />
                 
                 {/* Emoji circles at image edges */}
                 <div className="absolute top-2 left-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">

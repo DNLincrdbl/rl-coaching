@@ -54,7 +54,7 @@ const Navbar = () => {
                 whileTap={{ scale: 0.95 }}
                 className="relative"
               >
-                <span className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text hover:from-cyan-300 hover:via-blue-400 hover:to-purple-500 transition-all duration-300">
+                <span className="text-3xl font-black bg-gradient-to-r from-cyan-400/80 via-blue-500/80 to-purple-600/80 text-transparent bg-clip-text hover:from-cyan-300/70 hover:via-blue-400/70 hover:to-purple-500/70 transition-all duration-300">
                   JusTZoly
                 </span>
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -80,16 +80,16 @@ const Navbar = () => {
 
             <div className="hidden md:flex items-center space-x-8">
               <button 
-                onClick={() => smoothScrollTo('about')}
-                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
-                Rólam
-              </button>
-              <button 
                 onClick={() => smoothScrollTo('shop')}
                 className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Digitális termékek
+              </button>
+              <button 
+                onClick={() => smoothScrollTo('about')}
+                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                Rólam
               </button>
               <button 
                 onClick={() => smoothScrollTo('contact')}
@@ -158,16 +158,16 @@ const Navbar = () => {
         <div className="md:hidden fixed top-20 inset-x-0 z-40 bg-white/90 dark:bg-[#0A0F1C]/90 backdrop-blur border-b border-gray-200/50 dark:border-white/10">
           <div className="container mx-auto px-4 py-4 space-y-2">
             <button 
-              onClick={() => { smoothScrollTo('about'); setIsMobileMenuOpen(false); }}
-              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
-            >
-              Rólam
-            </button>
-            <button 
               onClick={() => { smoothScrollTo('shop'); setIsMobileMenuOpen(false); }}
               className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
             >
               Digitális termékek
+            </button>
+            <button 
+              onClick={() => { smoothScrollTo('about'); setIsMobileMenuOpen(false); }}
+              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
+            >
+              Rólam
             </button>
             <button 
               onClick={() => { smoothScrollTo('contact'); setIsMobileMenuOpen(false); }}

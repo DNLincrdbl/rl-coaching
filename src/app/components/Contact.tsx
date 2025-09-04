@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FaDiscord, FaEnvelope, FaSteam } from 'react-icons/fa';
+import { FaDiscord, FaEnvelope, FaInstagram } from 'react-icons/fa';
 
 const contactMethods = [
   {
@@ -23,13 +23,13 @@ const contactMethods = [
     description: 'Írj nekem e-mailt'
   },
   {
-    id: 'steam',
-    name: 'Steam',
-    icon: FaSteam,
+    id: 'instagram',
+    name: 'Instagram',
+    icon: FaInstagram,
     link: '#',
-    color: 'from-gray-600 to-gray-700',
-    hoverColor: 'hover:shadow-gray-500/25',
-    description: 'Kövess Steamen'
+    color: 'from-pink-500 to-rose-500',
+    hoverColor: 'hover:shadow-pink-500/25',
+    description: 'Kövess Instagramon'
   }
 ];
 
@@ -61,7 +61,7 @@ export default function Contact() {
               Kezdjük el a közös munkát
             </h2>
             <p className="mt-6 text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-              Válaszd ki a számodra legkényelmesebb kapcsolatfelvételi módot, és kezdjük el közösen a fejlődésed útját.
+              Válaszd ki a számodra legkényelmesebb kapcsolatfelvételi módot.
             </p>
           </div>
 

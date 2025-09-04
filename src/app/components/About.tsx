@@ -31,7 +31,7 @@ export default function About() {
               viewport={{ once: true }}
               className="text-blue-600 dark:text-blue-400 font-medium tracking-wider uppercase text-sm mb-4 block"
             >
-              Ismerd meg az oktatód
+              Ismerj meg jobban
             </motion.span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-gray-900 via-gray-600 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
               Rólam
@@ -71,13 +71,13 @@ export default function About() {
             >
               <div className="space-y-6">
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
-                  Grand Champion Oktató
+                  Supersonic Legend Oktató
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
                   15 évesen kezdtem el játszani a Rocket League-el és már az elején láttam, hogy nincs ehhez a játékhoz hasonló. Beszippantott. Minden szabadidőmet erre fordítottam. Élveztem a kihívást amit nyújtott és azt, hogy hónapról hónapra egyre jobb vagyok.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  Sok-sok év és elszánt gyakorlás után elértem a legmagasabb rangot a játékban. Ez az időszak egy fontos dologra tanított meg: <strong>A konzisztens, kemény munkának látszódni fog az eredménye.</strong> Viszont nem mindig volt ez egyszerű. Számtalan nehézséggel küzdöttem meg az utam során, ennek hatására pedig létrehoztam egy programot, ami megkönnyíti a fejlődésed: <Link href="#shop" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Rocket League Mesterfokon</Link>.
+                  Sok-sok év és elszánt gyakorlás után elértem a legmagasabb rangot a játékban. Ez az időszak egy fontos dologra tanított meg: <strong>A konzisztens, kemény munkának látszódni fog az eredménye.</strong> Viszont nem mindig volt ez egyszerű. Számtalan nehézséggel küzdöttem meg az utam során, ennek hatására pedig létrehoztam egy programot, ami megkönnyíti a fejlődésed: <Link href="#shop" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold cursor-pointer relative z-10">Rocket League Mesterfokon</Link>.
                 </p>
               </div>
 

@@ -2,8 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { FaDumbbell, FaTimes, FaCheck, FaStar, FaPlay, FaGamepad } from 'react-icons/fa';
-import { useState } from 'react';
+import { FaPlay, FaGamepad, FaStar, FaTimes, FaDumbbell, FaUtensils, FaBrain, FaCheck } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 
 const rocketLeagueServices = [
   {
@@ -11,7 +11,7 @@ const rocketLeagueServices = [
     name: 'Rocket League Mesterfokon',
     description: 'Komplex fejlődési program havi előfizetéssel',
     price: 'Havi előfizetés',
-    fullPrice: '15.000 Ft/hó',
+    fullPrice: '3.990 Ft/hó',
     icon: '/icons/Ikon Rocket League Mesterfokon.jpg',
     color: 'from-orange-500 to-red-500',
     isPremium: true,
@@ -24,8 +24,8 @@ const rocketLeagueServices = [
     id: 'coaching',
     name: 'Coaching',
     description: 'Egyéni órák professzionális oktatóval',
-    price: 'Óránként',
-    fullPrice: '8.000 Ft/óra',
+    price: 'Óránkénti díjazás',
+    fullPrice: '5.990 Ft/óra',
     icon: '/icons/Ikon Coaching.jpg',
     color: 'from-blue-500 to-purple-500',
     isPremium: false,
@@ -37,9 +37,9 @@ const rocketLeagueServices = [
   {
     id: 'play',
     name: 'Közös Játék',
-    description: 'Játssz velem és tanulj közben',
-    price: 'Óránként',
-    fullPrice: '6.000 Ft/óra',
+    description: 'Játssz velem és fejlődj a gyakorlatban',
+    price: 'Óránkénti díjazás',
+    fullPrice: '3.990 Ft/óra',
     icon: '/icons/icon_play_together.jpg',
     color: 'from-green-500 to-blue-500',
     isPremium: false,
@@ -53,7 +53,7 @@ const rocketLeagueServices = [
     name: 'Replay Elemzés',
     description: 'Részletes játék elemzés videóval',
     price: 'Elemzésenként',
-    fullPrice: '4.000 Ft/elemzés',
+    fullPrice: '2.990 Ft/elemzés',
     icon: '/icons/icon_elemzes.jpg',
     color: 'from-purple-500 to-pink-500',
     isPremium: false,
@@ -78,7 +78,35 @@ const otherServices = [
     detailedDescription: 'Komplett otthoni fitness program gamereknek! Nincs szükség edzőteremre - csak a saját testsúlyoddal dolgozunk. Egészséges gamer életmód kialakítása.',
     benefits: ['50+ gyakorlat videóval', 'Táplálkozási útmutató', 'Gaming szünetek optimalizálása', 'Progresszív edzésterv', 'Életmód tanácsok'],
     duration: 'Élethosszig hozzáférés'
-    }
+  },
+  {
+    id: 'cookbook',
+    name: 'Gamer Szakácskönyv',
+    description: 'Gyors és egészséges receptek gaming szünetekre',
+    price: 'Egyszeri vásárlás',
+    fullPrice: '8.000 Ft',
+    icon: FaUtensils,
+    color: 'from-orange-500 to-red-500',
+    isPremium: false,
+    features: ['50+ gyors recept', 'Gaming-barát ételek', 'Tápanyag optimalizált', 'Egyszerű elkészítés'],
+    detailedDescription: 'Speciálisan gamereknek készített szakácskönyv! Gyors, egészséges és finom receptek, amelyek nem zavarják meg a játékot.',
+    benefits: ['5-15 perces receptek', 'Egy kézzel ehető ételek', 'Energianövelő snackek', 'Hidratáló italok', 'Gaming maratoni menük'],
+    duration: 'Élethosszig hozzáférés'
+  },
+  {
+    id: 'combo',
+    name: 'Komplett csomag',
+    description: 'Testsúly program + Szakácskönyv együtt',
+    price: 'Egyszeri vásárlás',
+    fullPrice: '18.000 Ft',
+    icon: FaDumbbell,
+    color: 'from-emerald-500 to-cyan-500',
+    isPremium: false,
+    features: ['Otthoni edzések', '50+ gyors recept', 'Táplálkozási tanácsok', 'Gaming-egészség egyensúly'],
+    detailedDescription: 'A teljes gamer életmód csomag! Kombináld az otthoni fitness programot az egészséges táplálkozással. Minden amit egy egészséges gamer életmódhoz szükséges.',
+    benefits: ['50+ gyakorlat videóval', '5-15 perces receptek', 'Táplálkozási útmutató', 'Gaming szünetek optimalizálása', 'Progresszív edzésterv', 'Egy kézzel ehető ételek'],
+    duration: 'Élethosszig hozzáférés'
+  }
 ];
 
 export default function Shop() {
@@ -88,11 +116,19 @@ export default function Shop() {
 
   const openModal = (service: any) => {
     setSelectedService(service);
+    document.body.style.overflow = 'hidden';
   };
 
   const closeModal = () => {
     setSelectedService(null);
+    document.body.style.overflow = 'unset';
   };
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   return (
     <section id="shop" className="py-32 relative">
@@ -134,28 +170,6 @@ export default function Shop() {
         }}
       />
       
-      {/* Floating Particles */}
-      {[...Array(6)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30"
-          style={{
-            left: `${20 + i * 15}%`,
-            top: `${30 + (i % 3) * 20}%`,
-          }}
-          animate={{
-            y: [-20, 20, -20],
-            opacity: [0.3, 0.7, 0.3],
-          }}
-          transition={{
-            duration: 4 + i * 0.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.3,
-          }}
-        />
-      ))}
-
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -178,7 +192,7 @@ export default function Shop() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl md:text-6xl font-bold mt-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent"
+              className="text-5xl md:text-6xl font-bold mt-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent leading-tight"
             >
               Digitális Termékek
             </motion.h2>
@@ -336,7 +350,7 @@ export default function Shop() {
               viewport={{ once: true }}
               className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-8 text-center"
             >
-              Egyéb
+              Fitness
             </motion.h3>
             
             <div className={`${isSingleOther ? 'flex justify-center' : 'grid md:grid-cols-2 lg:grid-cols-3'} gap-8 max-w-4xl mx-auto`}>
@@ -449,7 +463,7 @@ export default function Shop() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.7, opacity: 0, y: 50 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200/50 dark:border-white/10 shadow-2xl"
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl p-4 max-w-lg w-full h-auto border border-gray-200/50 dark:border-white/10 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -463,12 +477,12 @@ export default function Shop() {
               </motion.button>
 
               {/* Header */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-4">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className={`w-20 h-20 mx-auto mb-6 rounded-2xl overflow-hidden ${
+                  className={`w-16 h-16 mx-auto mb-3 rounded-2xl overflow-hidden ${
                     selectedService.isPremium 
                       ? 'bg-gradient-to-br from-orange-500 to-red-500' 
                       : selectedService.icon === FaDumbbell 
@@ -477,13 +491,13 @@ export default function Shop() {
                   } flex items-center justify-center shadow-xl`}
                 >
                   {selectedService.icon === FaDumbbell ? (
-                    <selectedService.icon className="w-10 h-10 text-white" />
+                    <selectedService.icon className="w-8 h-8 text-white" />
                   ) : (
                     <Image
                       src={selectedService.icon}
                       alt={selectedService.name}
-                      width={80}
-                      height={80}
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover"
                     />
                   )}
@@ -493,7 +507,7 @@ export default function Shop() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
+                  className="text-xl font-bold text-gray-900 dark:text-white mb-2"
                 >
                   {selectedService.name}
                 </motion.h2>
@@ -502,10 +516,10 @@ export default function Shop() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="flex items-center justify-center gap-4 mb-6"
+                  className="flex items-center justify-center gap-3 mb-4"
                 >
-                  <span className="text-lg text-gray-600 dark:text-gray-400">{selectedService.price}</span>
-                  <span className={`text-3xl font-bold ${
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{selectedService.price}</span>
+                  <span className={`text-xl font-bold ${
                     selectedService.isPremium 
                       ? 'bg-gradient-to-r from-orange-600 to-red-600' 
                       : selectedService.icon === FaDumbbell 
@@ -534,33 +548,33 @@ export default function Shop() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="space-y-8"
+                className="space-y-4"
               >
                 {/* Description */}
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <FaGamepad className="w-5 h-5 text-blue-500" />
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    <FaGamepad className="w-4 h-4 text-blue-500" />
                     Részletes leírás
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
                     {selectedService.detailedDescription}
                   </p>
                 </div>
 
                 {/* Benefits */}
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <FaCheck className="w-5 h-5 text-green-500" />
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    <FaCheck className="w-4 h-4 text-green-500" />
                     Mit tartalmaz?
                   </h3>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    {selectedService.benefits.map((benefit: string, index: number) => (
+                  <div className="grid grid-cols-1 gap-2">
+                    {selectedService.benefits.slice(0, 4).map((benefit: string, index: number) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.7 + index * 0.1 }}
-                        className="flex items-center gap-3 p-3 bg-gray-50/80 dark:bg-gray-800/50 rounded-xl"
+                        className="flex items-center gap-2 p-2 bg-gray-50/80 dark:bg-gray-800/50 rounded-lg text-sm"
                       >
                         <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex-shrink-0" />
                         <span className="text-gray-700 dark:text-gray-300 text-sm">{benefit}</span>
@@ -570,26 +584,26 @@ export default function Shop() {
                 </div>
 
                 {/* Duration */}
-                <div className="bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/20 dark:to-purple-900/20 p-6 rounded-2xl border border-blue-200/30 dark:border-blue-500/20">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                    <FaPlay className="w-4 h-4 text-blue-500" />
+                <div className="bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/20 dark:to-purple-900/20 p-3 rounded-xl border border-blue-200/30 dark:border-blue-500/20">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                    <FaPlay className="w-3 h-3 text-blue-500" />
                     Időtartam
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">{selectedService.duration}</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">{selectedService.duration}</p>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-4 pt-4">
+                <div className="flex gap-3 pt-2">
                   <motion.button
                     onClick={closeModal}
-                    className="flex-1 py-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Bezárás
                   </motion.button>
                   <motion.button
-                    className={`flex-1 py-4 text-white rounded-2xl font-bold shadow-lg ${
+                    className={`flex-1 py-3 text-white rounded-xl font-bold shadow-lg text-sm ${
                       selectedService.isPremium 
                         ? 'bg-gradient-to-r from-orange-500 to-red-500 shadow-orange-500/30' 
                         : selectedService.icon === FaDumbbell 

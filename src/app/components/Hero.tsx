@@ -62,7 +62,7 @@ export default function Hero() {
       highlightText: "játékosok",
       titleEnd: "közül",
       highlightColors: "from-blue-400 via-purple-400 to-blue-400",
-      description: "Személyre szabott edzéstervvel és profi útmutatással segítek elérni a következő szintet a Rocket League-ben.",
+      description: "Profi útmutatással és gyakorlati tippekkel segítek elérni a következő szintet a Rocket League-ben.",
       primaryButton: "Kezdjük el",
       primaryButtonColors: "from-blue-500 to-purple-500",
       primaryButtonShadow: "hover:shadow-blue-500/25",
@@ -77,10 +77,10 @@ export default function Hero() {
       titleEnd: "gamer",
       highlightColors: "from-emerald-400 via-green-500 to-emerald-400",
       description: "Kombináld a gaming szenvedélyt az egészséges életmóddal. Építsd fel az erős tested, miközben fejlődsz a játékban.",
-      primaryButton: "Egészséges program",
+      primaryButton: "Kezdjük el",
       primaryButtonColors: "from-green-500 to-emerald-500",
       primaryButtonShadow: "hover:shadow-green-500/25",
-      secondaryButton: "Fitness útmutató"
+      secondaryButton: "Tudj meg többet"
     }
   ];
 
@@ -199,7 +199,7 @@ export default function Hero() {
                   whileHover={{ scale: 1.01, y: -2 }}
                   whileTap={{ scale: 0.99 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className={`px-6 py-3 bg-gradient-to-r ${currentHero.primaryButtonColors} rounded-xl text-base font-medium hover:shadow-lg ${currentHero.primaryButtonShadow} transition-all text-white`}
+                  className={`px-6 py-4 bg-gradient-to-r ${currentHero.primaryButtonColors} rounded-xl text-base font-medium hover:shadow-lg ${currentHero.primaryButtonShadow} transition-all text-white leading-none`}
                 >
                   {currentHero.primaryButton}
                 </motion.button>
