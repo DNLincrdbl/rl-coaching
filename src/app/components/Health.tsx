@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
+import BeforeAfterSlider from './BeforeAfterSlider';
 
 export default function Health() {
   return (
@@ -90,53 +90,9 @@ export default function Health() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden">
-                {/* Before/After image */}
-                <Image
-                  src="/testsulykep/hq720.jpg"
-                  alt="Fizikai fejlődés - Előtte és utána"
-                  fill
-                  className="object-cover"
-                />
-                
-                {/* Emoji circles at image edges */}
-                <div className="absolute top-2 left-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
-                  <span className="text-2xl">📊</span>
-                </div>
-                <div className="absolute bottom-2 right-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
-                  <span className="text-2xl">💪</span>
-                </div>
-                
-                {/* Before/After labels */}
-                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">
-                  Előtte
-                </div>
-                <div className="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">
-                  Utána
-                </div>
+              <div className="relative aspect-[4/3] w-full h-full">
+                <BeforeAfterSlider />
               </div>
-              
-              {/* Stats below */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="mt-2 grid grid-cols-3 gap-2"
-              >
-                <div className="text-center p-2 rounded-lg bg-gray-100/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10">
-                  <div className="text-lg font-bold text-green-600 dark:text-green-400 mb-0.5">+15kg</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Izomtömeg</div>
-                </div>
-                <div className="text-center p-2 rounded-lg bg-gray-100/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10">
-                  <div className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-0.5">-8kg</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Zsír</div>
-                </div>
-                <div className="text-center p-2 rounded-lg bg-gray-100/80 dark:bg-white/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10">
-                  <div className="text-lg font-bold text-purple-600 dark:text-purple-400 mb-0.5">2 év</div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">alatt</div>
-                </div>
-              </motion.div>
             </motion.div>
           </div>
         </motion.div>
