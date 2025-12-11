@@ -42,7 +42,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed w-full z-50 bg-white/80 dark:bg-[#0A0F1C]/80 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5">
+      <nav className="fixed w-full z-50 bg-[#0A0F1C]/90 backdrop-blur-xl border-b border-white/5">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             <button 
@@ -54,10 +54,10 @@ const Navbar = () => {
                 whileTap={{ scale: 0.95 }}
                 className="relative"
               >
-                <span className="text-3xl font-black bg-gradient-to-r from-cyan-400/80 via-blue-500/80 to-purple-600/80 text-transparent bg-clip-text hover:from-cyan-300/70 hover:via-blue-400/70 hover:to-purple-500/70 transition-all duration-300">
+                <span className="text-3xl font-black bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 text-transparent bg-clip-text">
                   JusTZoly
                 </span>
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-600/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute -inset-1 bg-gradient-to-r from-orange-400/20 via-red-500/20 to-orange-400/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </motion.div>
             </button>
             
@@ -81,19 +81,19 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => smoothScrollTo('shop')}
-                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
               >
                 Digitális termékek
               </button>
               <button 
                 onClick={() => smoothScrollTo('about')}
-                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
               >
                 Rólam
               </button>
               <button 
                 onClick={() => smoothScrollTo('contact')}
-                className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
               >
                 Kapcsolat
               </button>
@@ -110,24 +110,52 @@ const Navbar = () => {
 
                   {/* Profile Menu */}
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-xl">
+                    <div className="absolute right-0 mt-2 w-64 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-xl z-50">
                       <Link
                         href="/dashboard"
-                        className="block px-4 py-2 text-sm text-white hover:bg-white/5 transition-colors"
+                        className="block px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors border-b border-white/5"
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        Dashboard
+                        <span className="flex items-center gap-2">
+                          <FaUser className="w-4 h-4 text-gray-400" />
+                          Profil
+                        </span>
                       </Link>
                       <Link
-                        href="/courses"
-                        className="block px-4 py-2 text-sm text-white hover:bg-white/5 transition-colors"
+                        href="/dashboard"
+                        className="block px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors"
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        Kurzusaim
+                        <span className="flex items-center gap-2">
+                          <span className="text-orange-500">🚀</span>
+                          Rocket League Mesterfokon
+                        </span>
+                      </Link>
+                      <Link
+                        href="#"
+                        className="block px-4 py-3 text-sm text-gray-500 cursor-not-allowed"
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>💪</span>
+                          JusTZoly Edzésprogram
+                          <span className="text-xs bg-white/10 px-1.5 py-0.5 rounded ml-auto">Hamarosan</span>
+                        </span>
+                      </Link>
+                      <Link
+                        href="#"
+                        className="block px-4 py-3 text-sm text-gray-500 cursor-not-allowed border-b border-white/5"
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>📖</span>
+                          JusTZoly Receptkönyv
+                          <span className="text-xs bg-white/10 px-1.5 py-0.5 rounded ml-auto">Hamarosan</span>
+                        </span>
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-white/5 transition-colors flex items-center gap-2"
                       >
                         <FaSignOutAlt className="w-4 h-4" />
                         Kijelentkezés
@@ -155,23 +183,23 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-20 inset-x-0 z-40 bg-white/90 dark:bg-[#0A0F1C]/90 backdrop-blur border-b border-gray-200/50 dark:border-white/10">
+        <div className="md:hidden fixed top-20 inset-x-0 z-40 bg-[#0A0F1C]/95 backdrop-blur-xl border-b border-white/10">
           <div className="container mx-auto px-4 py-4 space-y-2">
             <button 
               onClick={() => { smoothScrollTo('shop'); setIsMobileMenuOpen(false); }}
-              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
+              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
             >
               Digitális termékek
             </button>
             <button 
               onClick={() => { smoothScrollTo('about'); setIsMobileMenuOpen(false); }}
-              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
+              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
             >
               Rólam
             </button>
             <button 
               onClick={() => { smoothScrollTo('contact'); setIsMobileMenuOpen(false); }}
-              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
+              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
             >
               Kapcsolat
             </button>

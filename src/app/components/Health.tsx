@@ -1,23 +1,35 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import BeforeAfterSlider from './BeforeAfterSlider';
 
 export default function Health() {
   return (
-    <section id="health" className="py-32 relative">
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-green-100/50 dark:via-green-500/5 to-transparent" />
+    <section id="health" className="py-32 relative bg-[#0A0F1C]">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div 
+          className="absolute top-1/3 -left-40 w-[500px] h-[500px] bg-green-500/10 rounded-full blur-[150px]"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-1/3 -right-40 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[120px]"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.12, 0.08] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+      </div>
+      
+      {/* Grid Pattern */}
       <div 
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, ${typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? 'white' : 'gray'} 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
+          backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+          backgroundSize: '50px 50px'
         }}
       />
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -29,16 +41,19 @@ export default function Health() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="text-green-600 dark:text-green-400 font-medium tracking-wider uppercase text-sm mb-4 block"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-green-500/10 border border-green-500/20 text-green-400 backdrop-blur-sm"
             >
-              Egészség és Gaming
+              💪 Egészséges életmód
             </motion.span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-gray-900 via-gray-600 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent leading-tight pb-2">
-              A Játék és Az Egészség
+            <h2 className="text-4xl md:text-5xl font-bold mt-6 text-white">
+              A Játék és Az{' '}
+              <span className="bg-gradient-to-r from-green-400 to-emerald-400 text-transparent bg-clip-text">
+                Egészség
+              </span>
             </h2>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left - Story */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -46,41 +61,21 @@ export default function Health() {
               viewport={{ once: true }}
               className="space-y-6"
             >
-              <div className="space-y-4">
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-400 text-transparent bg-clip-text">
-                  Az Egészség Felismerése
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  23 évesen úgy éreztem, hogy valami hiányzik. Tükörbe néztem: Törékenynek tűntem, alig volt rajtam izom - Egészségtelen voltam. Sokszor rendeltem gyorséttermekből és alig mozogtam, ezért egyre gyengébb volt a testem. Ennek változnia kellett.
-                </p>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  A következő hónapokban beleástam magam abba, hogyan építhetek egy jobb, erősebb fizikumot. Miután elkezdtem edzeni és odafigyelni arra mit eszek, realizáltam, hogy <strong>a gamelés és az edzés nem is annyira különbözik</strong>. Mindkettőben ugyanaz a dolog fogott meg: A fejlődés.
-                </p>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  Lassan rájöttem, hogy mi effektív és mi nem. Kialakítottam egy rendszert, ami működött számomra, eredményeket hozott, és tudtam magam tartani hozzá. Megakarom mutatni, hogyan lehetsz otthonról te is egészséges és egy magas szintű gamer: <Link href="#fitness" className="text-green-600 dark:text-green-400 hover:underline font-semibold cursor-pointer relative z-10">A JusTZoly Testsúly Program</Link>.
-                </p>
-              </div>
-
-              {/* Key insight */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-                className="p-4 bg-green-100 dark:bg-green-500/10 rounded-xl border border-green-200/50 dark:border-green-500/20"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs">💡</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-semibold text-green-800 dark:text-green-300 mb-1">A Kulcs Felismerés</h4>
-                    <p className="text-green-700 dark:text-green-400 text-sm">
-                      A gaming és az edzés ugyanazt a fejlődési elvet követi: konzisztencia, kihívás, és fokozatos fejlődés.
-                    </p>
-                  </div>
+              <p className="text-gray-400 leading-relaxed text-xl">
+                Egészségesebb légkörré próbálom tenni a gaminget, azzal hogy segítek átvenni az irányítást nem csak a játék, hanem az egészség felett.
+              </p>
+              
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <p className="text-2xl font-bold text-green-400">50+</p>
+                  <p className="text-sm text-gray-500">Gyakorlat</p>
                 </div>
-              </motion.div>
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <p className="text-2xl font-bold text-green-400">100%</p>
+                  <p className="text-sm text-gray-500">Otthon végezhető</p>
+                </div>
+              </div>
             </motion.div>
             
             {/* Right - Before/After Image */}
@@ -90,7 +85,7 @@ export default function Health() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="relative aspect-[4/3] w-full h-full">
+              <div className="relative aspect-[4/3] w-full h-full rounded-2xl overflow-hidden border border-white/10">
                 <BeforeAfterSlider />
               </div>
             </motion.div>

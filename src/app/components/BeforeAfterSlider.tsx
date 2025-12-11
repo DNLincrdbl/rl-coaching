@@ -1,46 +1,103 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export default function BeforeAfterSlider() {
-  const [showBefore, setShowBefore] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const images = [
+    { src: "/zoli/front.jpg", alt: "Előtte" },
+    { src: "/zoli/back.jpg", alt: "Utána" }
+  ];
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  // Auto-slide effect
+  useEffect(() => {
+    if (!isHovering) {
+      intervalRef.current = setInterval(() => {
+        nextSlide();
+      }, 5000);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isHovering]);
 
   return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gray-100 dark:bg-gray-800">
-      {/* Main Image */}
-      <div className="relative w-full h-full transition-opacity duration-500">
-        <Image
-          src={showBefore ? "/zoli/front.jpg" : "/zoli/back.jpg"}
-          alt={showBefore ? "Előtte" : "Utána"}
-          fill
-          className="object-cover"
-          priority
-        />
+    <div 
+      className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gray-100 dark:bg-gray-800 group"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      {/* Main Image with slide animation */}
+      <div className="relative w-full h-full">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
+              index === currentIndex 
+                ? 'translate-x-0' 
+                : index < currentIndex 
+                  ? '-translate-x-full' 
+                  : 'translate-x-full'
+            }`}
+          >
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        ))}
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4">
-        <button
-          onClick={() => setShowBefore(true)}
-          className={`px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 ${
-            showBefore 
-              ? 'bg-green-500 text-white shadow-lg scale-105' 
-              : 'bg-white/80 text-gray-800 hover:bg-white/90 dark:bg-gray-700/80 dark:text-white dark:hover:bg-gray-600/90'
-          }`}
-        >
-          Elölről
-        </button>
-        <button
-          onClick={() => setShowBefore(false)}
-          className={`px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 ${
-            !showBefore 
-              ? 'bg-green-500 text-white shadow-lg scale-105' 
-              : 'bg-white/80 text-gray-800 hover:bg-white/90 dark:bg-gray-700/80 dark:text-white dark:hover:bg-gray-600/90'
-          }`}
-        >
-          Hátulról
-        </button>
+      {/* Arrow Navigation - appears on hover */}
+      <button
+        onClick={prevSlide}
+        className={`absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm ${
+          isHovering ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <FaChevronLeft className="w-4 h-4" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className={`absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm ${
+          isHovering ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <FaChevronRight className="w-4 h-4" />
+      </button>
+
+      {/* Slide indicators */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === currentIndex 
+                ? 'bg-green-500 w-4' 
+                : 'bg-white/60 hover:bg-white/80'
+            }`}
+          />
+        ))}
       </div>
 
       {/* State indicators */}

@@ -9,59 +9,61 @@ import {
   FaHistory, 
   FaBell, 
   FaQuestionCircle,
-  FaChevronDown
+  FaChevronDown,
+  FaRocket,
+  FaDumbbell,
+  FaBook
 } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function ProfileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const router = useRouter();
 
   const menuItems = [
     {
       icon: FaUser,
       label: 'Profil',
+      href: '/dashboard',
       onClick: () => {
-        // TODO: Navigate to profile page
+        router.push('/dashboard');
         setIsOpen(false);
       }
     },
     {
-      icon: FaHistory,
-      label: 'Kurzusaim',
+      icon: FaRocket,
+      label: 'Rocket League Mesterfokon',
+      href: '/dashboard',
       onClick: () => {
-        // TODO: Navigate to courses page
+        router.push('/dashboard');
         setIsOpen(false);
       }
     },
     {
-      icon: FaBell,
-      label: 'Értesítések',
+      icon: FaDumbbell,
+      label: 'JusTZoly Edzésprogram',
+      href: '#',
       onClick: () => {
-        // TODO: Navigate to notifications
+        // TODO: Navigate to training program
         setIsOpen(false);
       }
     },
     {
-      icon: FaCog,
-      label: 'Beállítások',
+      icon: FaBook,
+      label: 'JusTZoly Receptkönyv',
+      href: '#',
       onClick: () => {
-        // TODO: Navigate to settings
-        setIsOpen(false);
-      }
-    },
-    {
-      icon: FaQuestionCircle,
-      label: 'Segítség',
-      onClick: () => {
-        // TODO: Navigate to help
+        // TODO: Navigate to recipe book
         setIsOpen(false);
       }
     },
     {
       icon: FaSignOutAlt,
       label: 'Kijelentkezés',
+      href: '#',
       onClick: () => {
         signOut();
         setIsOpen(false);

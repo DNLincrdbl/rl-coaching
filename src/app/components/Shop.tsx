@@ -9,7 +9,7 @@ const rocketLeagueServices = [
   {
     id: 'rlm',
     name: 'Rocket League Mesterfokon',
-    description: 'Komplex fejlődési program havi előfizetéssel',
+    description: 'Csatlakozz a legjobb fejlesztő programba kevesebb mint 150 forintért naponta!',
     price: 'Havi előfizetés',
     fullPrice: '3.990 Ft/hó',
     icon: '/icons/Ikon Rocket League Mesterfokon.jpg',
@@ -23,7 +23,7 @@ const rocketLeagueServices = [
   {
     id: 'coaching',
     name: 'Coaching',
-    description: 'Egyéni órák professzionális oktatóval',
+    description: 'Foglalj időpontot és kapj exkluzív útmutatást!',
     price: 'Óránkénti díjazás',
     fullPrice: '5.990 Ft/óra',
     icon: '/icons/Ikon Coaching.jpg',
@@ -37,7 +37,7 @@ const rocketLeagueServices = [
   {
     id: 'play',
     name: 'Közös Játék',
-    description: 'Játssz velem és fejlődj a gyakorlatban',
+    description: 'Foglalj időpontot és játszunk együtt!',
     price: 'Óránkénti díjazás',
     fullPrice: '3.990 Ft/óra',
     icon: '/icons/icon_play_together.jpg',
@@ -51,7 +51,7 @@ const rocketLeagueServices = [
   {
     id: 'replay',
     name: 'Replay Elemzés',
-    description: 'Részletes játék elemzés videóval',
+    description: 'Töltsd fel a replayed és kapj részletes visszajelzést!',
     price: 'Elemzésenként',
     fullPrice: '2.990 Ft/elemzés',
     icon: '/icons/icon_elemzes.jpg',
@@ -67,8 +67,8 @@ const rocketLeagueServices = [
 const otherServices = [
   {
     id: 'bodyweight',
-    name: 'A JusTZoly Testsúly Program',
-    description: 'Otthoni edzés program egészséges gamer élethez',
+    name: 'JusTZoly Edzésprogram',
+    description: 'Hozd magad jó formába a saját testsúlyoddal!',
     price: 'Egyszeri vásárlás',
     fullPrice: '12.000 Ft',
     icon: FaDumbbell,
@@ -81,8 +81,8 @@ const otherServices = [
   },
   {
     id: 'cookbook',
-    name: 'Gamer Szakácskönyv',
-    description: 'Gyors és egészséges receptek gaming szünetekre',
+    name: 'JusTZoly Receptkönyv',
+    description: 'Edd azokat, amiket én, és érd el a célod!',
     price: 'Egyszeri vásárlás',
     fullPrice: '8.000 Ft',
     icon: FaUtensils,
@@ -95,8 +95,8 @@ const otherServices = [
   },
   {
     id: 'combo',
-    name: 'Komplett csomag',
-    description: 'Testsúly program + Szakácskönyv együtt',
+    name: 'Teljes JusTZoly Csomag',
+    description: 'Szerezd meg mindkettőt olcsóbban!',
     price: 'Egyszeri vásárlás',
     fullPrice: '18.000 Ft',
     icon: FaDumbbell,
@@ -131,46 +131,31 @@ export default function Shop() {
   }, []);
 
   return (
-    <section id="shop" className="py-32 relative">
-      {/* Enhanced Decorative Elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-100/50 dark:via-indigo-500/5 to-transparent" />
+    <section id="shop" className="py-32 relative bg-[#0A0F1C]">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div 
+          className="absolute top-20 -left-40 w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[150px]"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-20 -right-40 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[150px]"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+      </div>
+      
+      {/* Grid Pattern */}
       <div 
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, ${typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? 'white' : 'gray'} 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
+          backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+          backgroundSize: '50px 50px'
         }}
       />
       
-      {/* Animated Background Orbs */}
-      <motion.div 
-        className="absolute top-10 -left-20 w-72 h-72 bg-gradient-to-r from-blue-400/8 to-purple-400/8 rounded-full blur-xl"
-        animate={{
-          x: [0, 50, 0],
-          y: [0, -30, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div 
-        className="absolute -bottom-10 -right-20 w-96 h-96 bg-gradient-to-r from-green-400/6 to-teal-400/6 rounded-full blur-xl"
-        animate={{
-          x: [0, -40, 0],
-          y: [0, 40, 0],
-          scale: [1, 0.9, 1],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -183,7 +168,7 @@ export default function Shop() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="inline-block text-indigo-600 dark:text-indigo-400 font-medium tracking-wider uppercase text-sm mb-6 px-4 py-2 bg-indigo-100/50 dark:bg-indigo-500/10 rounded-full border border-indigo-200/50 dark:border-indigo-500/20"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-orange-500/10 border border-orange-500/20 text-orange-400 backdrop-blur-sm"
             >
               ✨ Szolgáltatásaim
             </motion.span>
@@ -192,16 +177,19 @@ export default function Shop() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl md:text-6xl font-bold mt-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent leading-tight"
+              className="text-4xl sm:text-5xl md:text-6xl font-bold mt-6 text-white"
             >
-              Digitális Termékek
+              Digitális{' '}
+              <span className="bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 bg-clip-text text-transparent">
+                Termékek
+              </span>
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-xl text-gray-600 dark:text-gray-400 mt-6 max-w-2xl mx-auto"
+              className="text-lg text-gray-400 mt-6 max-w-2xl mx-auto"
             >
               Válaszd ki a számodra legmegfelelőbb programot és kezdj fejlődni még ma!
             </motion.p>
@@ -213,8 +201,9 @@ export default function Shop() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-8 text-center"
+              className="text-2xl font-bold text-white mb-8 text-center flex items-center justify-center gap-3"
             >
+              <span className="text-orange-500">🎮</span>
               Rocket League
             </motion.h3>
             
@@ -240,95 +229,66 @@ export default function Shop() {
                   onHoverEnd={() => setHoveredCard(null)}
                 >
                   {service.isPremium && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md shadow-orange-500/15 border border-white/20 z-10">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-orange-500/30 z-10">
                       ⭐ Premium
                     </div>
                   )}
                   <div
-                    className={`relative p-8 rounded-3xl backdrop-blur-lg border-2 cursor-pointer group flex flex-col h-[420px] overflow-hidden ${
+                    className={`relative p-6 rounded-2xl backdrop-blur-xl border cursor-pointer group flex flex-col h-[420px] overflow-hidden transition-all duration-300 ${
                       service.isPremium 
-                        ? 'bg-gradient-to-br from-orange-500/12 via-red-500/8 to-pink-500/12 border-orange-300/25 dark:border-orange-400/30 shadow-xl shadow-orange-500/8'
-                        : 'bg-gradient-to-br from-white/15 via-blue-50/20 to-purple-50/15 dark:from-white/8 dark:via-blue-900/15 dark:to-purple-900/15 border-blue-200/30 dark:border-blue-400/25 shadow-xl shadow-blue-500/6'
+                        ? 'bg-gradient-to-br from-orange-500/10 via-red-500/5 to-transparent border-orange-500/20 hover:border-orange-500/40 shadow-xl shadow-orange-500/5'
+                        : 'bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/[0.07]'
                     }`}
-                    style={{
-                      transformStyle: 'preserve-3d'
-                    }}
                   >
                   {/* Animated Background Glow */}
                   <motion.div 
-                    className={`absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
+                    className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
                       service.isPremium 
-                        ? 'bg-gradient-to-br from-orange-400/6 to-red-400/6' 
-                        : 'bg-gradient-to-br from-blue-400/6 to-purple-400/6'
+                        ? 'bg-gradient-to-br from-orange-500/10 to-red-500/5' 
+                        : 'bg-gradient-to-br from-white/5 to-transparent'
                     }`}
-                    animate={hoveredCard === service.id ? {
-                      scale: [1, 1.01, 1],
-                      opacity: [0.3, 0.5, 0.3]
-                    } : {}}
-                    transition={{ duration: 2, repeat: Infinity }}
                   />
 
                   
-                  <div className="w-28 h-28 rounded-3xl overflow-hidden mb-6 mx-auto border-3 border-gradient-to-r from-blue-200 to-purple-200 dark:from-blue-400 dark:to-purple-400 relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/8 to-purple-400/8 rounded-3xl" />
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden mb-6 mx-auto relative">
                     <Image
                       src={service.icon}
                       alt={service.name}
-                      width={112}
-                      height={112}
-                      className="w-full h-full object-cover relative z-10"
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover"
                     />
-                    {hoveredCard === service.id && (
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-blue-400/12 to-purple-400/12 rounded-3xl"
-                        animate={{ opacity: [0, 0.5, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      />
-                    )}
                   </div>
                   
-                  <motion.h4 
-                    className="text-xl font-bold text-gray-900 dark:text-white mb-3 text-center h-14 flex items-center justify-center"
-                    whileHover={{ scale: 1.02, transition: { duration: 0.15 } }}
-                  >
+                  <h4 className="text-lg font-bold text-white mb-2 text-center h-12 flex items-center justify-center">
                     {service.name}
-                  </motion.h4>
+                  </h4>
                   
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 text-center flex-grow leading-relaxed h-20 flex items-start justify-center">
+                  <p className="text-gray-400 text-sm mb-4 text-center flex-grow leading-relaxed">
                     {service.description}
                   </p>
                   
-                  <div className="text-center mb-6">
-                    <motion.div
-                      whileHover={{ scale: 1.05, transition: { duration: 0.15 } }}
-                      className="inline-block"
-                    >
-                      <span className="text-sm text-gray-500 dark:text-gray-400 block mb-1">{service.price}</span>
-                      <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 text-transparent bg-clip-text">
-                        {service.fullPrice}
-                      </span>
-                    </motion.div>
+                  <div className="text-center mb-4">
+                    <span className={`text-2xl font-bold ${
+                      service.isPremium 
+                        ? 'bg-gradient-to-r from-orange-400 to-red-400' 
+                        : 'bg-gradient-to-r from-blue-400 to-purple-400'
+                    } text-transparent bg-clip-text`}>
+                      {service.fullPrice}
+                    </span>
                   </div>
                   
                   <motion.button 
                     onClick={() => openModal(service)}
-                    className={`w-full py-4 rounded-2xl font-bold text-white relative overflow-hidden group/btn ${
+                    className={`w-full py-3 rounded-xl font-semibold text-white transition-all ${
                       service.isPremium 
-                        ? 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 shadow-md shadow-orange-500/15' 
-                        : 'bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 shadow-md shadow-blue-500/15'
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-lg hover:shadow-orange-500/25' 
+                        : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:shadow-lg hover:shadow-blue-500/25'
                     }`}
-                    whileHover={{ 
-                      scale: 1.02,
-                      y: -2,
-                      transition: { duration: 0.15, ease: "easeOut" }
-                    }}
-                    whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"
-                      initial={false}
-                    />
-                    <span className="relative z-10 flex items-center justify-center gap-2 w-full h-full">
+                    <span className="flex items-center justify-center gap-2">
                       <FaPlay className="w-3 h-3" />
                       Részletek
                     </span>
@@ -340,7 +300,7 @@ export default function Shop() {
           </div>
 
           {/* Divider */}
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300/50 dark:via-white/20 to-transparent mb-16" />
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-16" />
 
           {/* Other Services */}
           <div>
@@ -348,8 +308,9 @@ export default function Shop() {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-8 text-center"
+              className="text-2xl font-bold text-white mb-8 text-center flex items-center justify-center gap-3"
             >
+              <span className="text-green-500">💪</span>
               Fitness
             </motion.h3>
             
@@ -357,86 +318,41 @@ export default function Shop() {
               {otherServices.map((service, index) => (
                 <motion.div
                   key={service.id}
-                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ 
-                    delay: index * 0.1,
-                    duration: 0.4,
-                    ease: [0.25, 0.46, 0.45, 0.94]
-                  }}
-                  whileHover={{ 
-                    scale: 1.03, 
-                    y: -8,
-                    transition: { duration: 0.15, ease: "easeOut" }
-                  }}
-                  onHoverStart={() => setHoveredCard(service.id)}
-                  onHoverEnd={() => setHoveredCard(null)}
-                  className="relative p-8 rounded-3xl backdrop-blur-lg border-2 border-green-200/30 dark:border-green-400/25 cursor-pointer group flex flex-col h-[420px] overflow-hidden bg-gradient-to-br from-green-50/20 via-teal-50/15 to-emerald-50/20 dark:from-green-900/15 dark:via-teal-900/10 dark:to-emerald-900/15 shadow-xl shadow-green-500/6"
-                  style={{
-                    transformStyle: 'preserve-3d'
-                  }}
+                  transition={{ delay: index * 0.1, duration: 0.4 }}
+                  whileHover={{ scale: 1.03, y: -8 }}
+                  className="relative p-6 rounded-2xl backdrop-blur-xl border border-white/10 cursor-pointer group flex flex-col h-[420px] overflow-hidden bg-white/5 hover:bg-white/[0.07] hover:border-green-500/30 transition-all duration-300"
                 >
                   {/* Animated Background Glow */}
-                  <motion.div 
-                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-green-400/6 to-teal-400/6"
-                    animate={hoveredCard === service.id ? {
-                      scale: [1, 1.01, 1],
-                      opacity: [0.3, 0.5, 0.3]
-                    } : {}}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
+                  <motion.div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-green-500/10 to-transparent" />
 
-                  <div className={`w-28 h-28 rounded-3xl bg-gradient-to-r ${service.color} flex items-center justify-center mb-6 mx-auto relative shadow-xl`}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-3xl" />
-                    <service.icon className="w-16 h-16 text-white relative z-10" />
-                    {hoveredCard === service.id && (
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-green-400/12 to-teal-400/12 rounded-3xl"
-                        animate={{ opacity: [0, 0.5, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      />
-                    )}
+                  <div className={`w-24 h-24 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-6 mx-auto relative`}>
+                    <service.icon className="w-12 h-12 text-white" />
                   </div>
                   
-                  <motion.h4 
-                    className="text-xl font-bold text-gray-900 dark:text-white mb-3 text-center h-14 flex items-center justify-center"
-                    whileHover={{ scale: 1.02, transition: { duration: 0.15 } }}
-                  >
+                  <h4 className="text-lg font-bold text-white mb-2 text-center h-12 flex items-center justify-center">
                     {service.name}
-                  </motion.h4>
+                  </h4>
                   
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 text-center flex-grow leading-relaxed h-20 flex items-start justify-center">
+                  <p className="text-gray-400 text-sm mb-4 text-center flex-grow leading-relaxed">
                     {service.description}
                   </p>
                   
-                  <div className="text-center mb-6">
-                    <motion.div
-                      whileHover={{ scale: 1.05, transition: { duration: 0.15 } }}
-                      className="inline-block"
-                    >
-                      <span className="text-sm text-gray-500 dark:text-gray-400 block mb-1">{service.price}</span>
-                      <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-400 dark:to-teal-400 text-transparent bg-clip-text">
-                        {service.fullPrice}
-                      </span>
-                    </motion.div>
+                  <div className="text-center mb-4">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 text-transparent bg-clip-text">
+                      {service.fullPrice}
+                    </span>
                   </div>
                   
                   <motion.button 
                     onClick={() => openModal(service)}
-                    className="w-full py-4 bg-gradient-to-r from-green-500 via-teal-500 to-emerald-500 text-white rounded-2xl font-bold relative overflow-hidden group/btn shadow-md shadow-green-500/15"
-                    whileHover={{ 
-                      scale: 1.02,
-                      y: -2,
-                      transition: { duration: 0.15, ease: "easeOut" }
-                    }}
-                    whileTap={{ scale: 0.96, transition: { duration: 0.1 } }}
+                    className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"
-                      initial={false}
-                    />
-                    <span className="relative z-10 flex items-center justify-center gap-2 w-full h-full">
+                    <span className="flex items-center justify-center gap-2">
                       <FaDumbbell className="w-3 h-3" />
                       Részletek
                     </span>
@@ -455,25 +371,25 @@ export default function Shop() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={closeModal}
           >
             <motion.div
-              initial={{ scale: 0.7, opacity: 0, y: 50 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.7, opacity: 0, y: 50 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl p-4 max-w-lg w-full h-auto border border-gray-200/50 dark:border-white/10 shadow-2xl"
+              className="bg-[#0D1321] backdrop-blur-xl rounded-2xl p-6 max-w-lg w-full border border-white/10 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <motion.button
                 onClick={closeModal}
-                className="absolute top-6 right-6 w-10 h-10 bg-gray-100/80 dark:bg-gray-800/80 rounded-full flex items-center justify-center hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-colors"
-                whileHover={{ scale: 1.1, rotate: 90 }}
+                className="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <FaTimes className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                <FaTimes className="w-4 h-4 text-gray-400" />
               </motion.button>
 
               {/* Header */}
@@ -507,7 +423,7 @@ export default function Shop() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-xl font-bold text-gray-900 dark:text-white mb-2"
+                  className="text-xl font-bold text-white mb-2"
                 >
                   {selectedService.name}
                 </motion.h2>
@@ -516,10 +432,9 @@ export default function Shop() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="flex items-center justify-center gap-3 mb-4"
+                  className="flex items-center justify-center mb-4"
                 >
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{selectedService.price}</span>
-                  <span className={`text-xl font-bold ${
+                  <span className={`text-2xl font-bold ${
                     selectedService.isPremium 
                       ? 'bg-gradient-to-r from-orange-600 to-red-600' 
                       : selectedService.icon === FaDumbbell 
@@ -552,18 +467,18 @@ export default function Shop() {
               >
                 {/* Description */}
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-                    <FaGamepad className="w-4 h-4 text-blue-500" />
+                  <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
+                    <FaGamepad className="w-4 h-4 text-orange-500" />
                     Részletes leírás
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
+                  <p className="text-gray-400 leading-relaxed text-sm">
                     {selectedService.detailedDescription}
                   </p>
                 </div>
 
                 {/* Benefits */}
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                  <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
                     <FaCheck className="w-4 h-4 text-green-500" />
                     Mit tartalmaz?
                   </h3>
@@ -574,43 +489,43 @@ export default function Shop() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.7 + index * 0.1 }}
-                        className="flex items-center gap-2 p-2 bg-gray-50/80 dark:bg-gray-800/50 rounded-lg text-sm"
+                        className="flex items-center gap-2 p-2 bg-white/5 rounded-lg text-sm"
                       >
-                        <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex-shrink-0" />
-                        <span className="text-gray-700 dark:text-gray-300 text-sm">{benefit}</span>
+                        <div className="w-2 h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex-shrink-0" />
+                        <span className="text-gray-300 text-sm">{benefit}</span>
                       </motion.div>
                     ))}
                   </div>
                 </div>
 
                 {/* Duration */}
-                <div className="bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/20 dark:to-purple-900/20 p-3 rounded-xl border border-blue-200/30 dark:border-blue-500/20">
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
-                    <FaPlay className="w-3 h-3 text-blue-500" />
+                <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                  <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                    <FaPlay className="w-3 h-3 text-orange-500" />
                     Időtartam
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">{selectedService.duration}</p>
+                  <p className="text-gray-400 text-sm">{selectedService.duration}</p>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-2">
                   <motion.button
                     onClick={closeModal}
-                    className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm"
+                    className="flex-1 py-3 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-colors text-sm"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Bezárás
                   </motion.button>
                   <motion.button
-                    className={`flex-1 py-3 text-white rounded-xl font-bold shadow-lg text-sm ${
+                    className={`flex-1 py-3 text-white rounded-xl font-bold text-sm ${
                       selectedService.isPremium 
-                        ? 'bg-gradient-to-r from-orange-500 to-red-500 shadow-orange-500/30' 
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-lg hover:shadow-orange-500/25' 
                         : selectedService.icon === FaDumbbell 
-                          ? 'bg-gradient-to-r from-green-500 to-teal-500 shadow-green-500/30'
-                          : 'bg-gradient-to-r from-blue-500 to-purple-500 shadow-blue-500/30'
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:shadow-lg hover:shadow-green-500/25'
+                          : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:shadow-lg hover:shadow-blue-500/25'
                     }`}
-                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Megrendelem

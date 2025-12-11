@@ -10,7 +10,6 @@ const contactMethods = [
     icon: FaDiscord,
     link: '#',
     color: 'from-[#5865F2] to-[#4752C4]',
-    hoverColor: 'hover:shadow-[#5865F2]/25',
     description: 'Csatlakozz a Discord szerveremhez'
   },
   {
@@ -18,8 +17,7 @@ const contactMethods = [
     name: 'E-mail',
     icon: FaEnvelope,
     link: 'mailto:contact@example.com',
-    color: 'from-blue-500 to-blue-600',
-    hoverColor: 'hover:shadow-blue-500/25',
+    color: 'from-orange-500 to-red-500',
     description: 'Írj nekem e-mailt'
   },
   {
@@ -28,58 +26,79 @@ const contactMethods = [
     icon: FaInstagram,
     link: '#',
     color: 'from-pink-500 to-rose-500',
-    hoverColor: 'hover:shadow-pink-500/25',
     description: 'Kövess Instagramon'
   }
 ];
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-32 relative">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-100/50 dark:via-purple-500/5 to-transparent" />
-             <div 
-         className="absolute inset-0 opacity-10"
-         style={{
-           backgroundImage: `radial-gradient(circle at 1px 1px, ${typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? 'white' : 'gray'} 1px, transparent 0)`,
-           backgroundSize: '40px 40px'
-         }}
-       />
+    <section id="contact" className="py-32 relative bg-[#0A0F1C]">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div 
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[150px]"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-orange-500/10 rounded-full blur-[120px]"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.12, 0.08] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+      </div>
+      
+      {/* Grid Pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+          backgroundSize: '50px 50px'
+        }}
+      />
 
-      <div className="container mx-auto px-4 relative">
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <motion.span
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="text-blue-600 dark:text-blue-400 font-medium tracking-wider uppercase text-sm mb-4 block"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-purple-500/10 border border-purple-500/20 text-purple-400 backdrop-blur-sm"
             >
-              Lépj kapcsolatba
+              📬 Lépj kapcsolatba
             </motion.span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-gray-900 via-gray-600 to-gray-900 dark:from-white dark:via-gray-300 dark:to-white bg-clip-text text-transparent">
-              Kezdjük el a közös munkát
+            <h2 className="text-4xl md:text-5xl font-bold mt-6 text-white">
+              Kezdjük el a közös{' '}
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">
+                munkát
+              </span>
             </h2>
-            <p className="mt-6 text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+            <p className="mt-6 text-gray-400 text-lg max-w-2xl mx-auto">
               Válaszd ki a számodra legkényelmesebb kapcsolatfelvételi módot.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {contactMethods.map((method) => (
+            {contactMethods.map((method, index) => (
               <motion.a
                 key={method.id}
                 href={method.link}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                className={`bg-gradient-to-r ${method.color} p-8 rounded-2xl backdrop-blur-lg hover:shadow-lg ${method.hoverColor} transition-all group`}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.03, y: -4 }}
+                className="relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:border-white/20 transition-all group overflow-hidden"
               >
-                <div className="flex flex-col items-center text-center">
-                  <method.icon className="w-12 h-12 mb-4 opacity-90 group-hover:opacity-100 transition-opacity" />
-                  <h3 className="text-xl font-bold mb-2">{method.name}</h3>
-                                     <p className="text-sm text-gray-100 dark:text-gray-300">{method.description}</p>
+                {/* Gradient overlay on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${method.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                
+                <div className="relative flex flex-col items-center text-center">
+                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${method.color} flex items-center justify-center mb-4 shadow-lg`}>
+                    <method.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">{method.name}</h3>
+                  <p className="text-sm text-gray-400">{method.description}</p>
                 </div>
               </motion.a>
             ))}
@@ -91,12 +110,12 @@ export default function Contact() {
             viewport={{ once: true }}
             className="mt-16 text-center"
           >
-                         <p className="text-gray-600 dark:text-gray-400">
-               Általában <span className="text-gray-900 dark:text-white font-medium">24 órán belül</span> válaszolok
-             </p>
+            <p className="text-gray-500">
+              Általában <span className="text-white font-medium">24 órán belül</span> válaszolok
+            </p>
           </motion.div>
         </div>
       </div>
     </section>
   );
-} 
+}

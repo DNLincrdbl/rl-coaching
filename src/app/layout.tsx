@@ -2,14 +2,13 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { CartProvider } from '@/contexts/CartContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'RL Coaching',
-  description: 'Rocket League coaching platform',
+  title: 'JusTZoly - Rocket League Coaching',
+  description: 'Professzionális Rocket League coaching platform',
   viewport: {
     width: 'device-width',
     initialScale: 1,
@@ -24,13 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="hu" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
           <AuthProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
+            {children}
           </AuthProvider>
         </ThemeProvider>
       </body>
