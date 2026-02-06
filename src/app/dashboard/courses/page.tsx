@@ -198,22 +198,13 @@ function VideoPlayer({
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
-  // Lock body scroll completely
+  // Prevent background scroll while modal is open
   useEffect(() => {
-    const scrollY = window.scrollY;
+    const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    document.documentElement.style.overflow = 'hidden';
     
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.documentElement.style.overflow = '';
-      window.scrollTo(0, scrollY);
+      document.body.style.overflow = originalOverflow;
     };
   }, []);
 

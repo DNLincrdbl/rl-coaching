@@ -116,19 +116,11 @@ export default function Shop() {
 
   const openModal = (service: any) => {
     setSelectedService(service);
-    document.body.style.overflow = 'hidden';
   };
 
   const closeModal = () => {
     setSelectedService(null);
-    document.body.style.overflow = 'unset';
   };
-
-  useEffect(() => {
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
 
   return (
     <section id="shop" className="py-32 relative bg-[#0A0F1C]">
