@@ -151,10 +151,11 @@ def run():
         db.session.commit()
 
         print("Seed complete.")
-        print(f"  Admin (Zoli): {Config.ADMIN_EMAIL} / {Config.ADMIN_PASSWORD}")
-        print("  Test users (password: Test1234!):")
+        print(f"  Admin: {Config.ADMIN_EMAIL} (jelszó: ADMIN_PASSWORD a .env-ből)")
+        print("  Demo userek (jelszó: a seed.py-ban beállított lokális demo jelszó):")
         for e in ["alex@test.hu", "brigi@test.hu", "dani@test.hu", "eszter@test.hu", "mark@test.hu"]:
             print(f"    - {e}")
+        print("  (A demo jelszavakat ne tedd README-be / ne pushold publikus doksiba.)")
 
 
 if __name__ == "__main__":
