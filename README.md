@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rocket League Mesterfokon
 
-## Getting Started
+Monorepo:
 
-First, run the development server:
+- **`frontend/`** — Next.js 16 (React 19, Tailwind v4) app, single fixed dark theme.
+- **`backend/`** — Flask (Python) API with SQLite, JWT auth in httpOnly cookies.
+
+## Futtatás
+
+### Backend (Flask)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env          # majd írd át a titkokat
+python seed.py                # adatbázis + teszt adatok
+python run.py                 # http://127.0.0.1:5001
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Frontend (Next.js)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd frontend
+npm install
+npm run dev                   # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+A frontend a `NEXT_PUBLIC_API_URL` env változóból veszi a backend címét
+(alapértelmezés: `http://localhost:5001`).
 
-## Learn More
+## Belépési adatok (seed után)
 
-To learn more about Next.js, take a look at the following resources:
+| Szerep | E-mail | Jelszó |
+| --- | --- | --- |
+| **Admin (Zoli)** | `zoli@rlm.hu` | `Admin1234!` |
+| Teszt user | `alex@test.hu` | `Test1234!` |
+| Teszt user | `brigi@test.hu` | `Test1234!` |
+| Teszt user (alap csomag) | `dani@test.hu` | `Test1234!` |
+| Teszt user | `eszter@test.hu` | `Test1234!` |
+| Teszt user | `mark@test.hu` | `Test1234!` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Az admin fiók a dashboardon külön **Admin** fülön látja az összes felhasználót,
+a beküldött replayeket, és értékelheti őket (ekkor jön létre a felhasználó
+"sheet"-je, amit a rendszer értesítéssel jelez neki).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Biztonság
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Jelszavak: PBKDF2-SHA256 (werkzeug), sózva.
+- JWT access/refresh token **httpOnly** cookie-ban, **CSRF** védelemmel.
+- CORS csak a frontend originre engedélyezve, credentials-szel.
+- Rate limiting (login/register), biztonsági response header-ök.
+- Titkok `.env`-ből (nincs verziókezelve); az admin jogosultság szerver oldalon
+  ellenőrzött minden admin végponton.

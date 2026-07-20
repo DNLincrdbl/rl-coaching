@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+/* Class-based dark variant so any `dark:` utilities follow the fixed .dark
+   class on <html> (the app has a single, permanent dark theme). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Core surface palette — full black, high-contrast product */
+  --rlm-bg: #000000;
+  --rlm-bg-elev: #0A0A0C;
+  --rlm-bg-elev-2: #101014;
+  --rlm-border: rgba(255, 255, 255, 0.07);
+  --rlm-border-strong: rgba(255, 255, 255, 0.14);
+  --rlm-text: #F4F5F7;
+  --rlm-text-muted: #8A8F99;
+
+  /* Brand accents */
+  --rlm-accent: #FF6A2B;
+  --rlm-accent-2: #FF2D55;
+  --rlm-accent-glow: rgba(255, 106, 43, 0.4);
+
+  /* Rating semantics */
+  --rlm-green: #34E27A;
+  --rlm-orange: #FFAE3B;
+  --rlm-red: #FF4D5E;
+
+  --background: var(--rlm-bg);
+  --foreground: var(--rlm-text);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--rlm-bg-elev);
+  --color-surface-2: var(--rlm-bg-elev-2);
+  --color-accent: var(--rlm-accent);
+  --color-accent-2: var(--rlm-accent-2);
+  --color-rate-green: var(--rlm-green);
+  --color-rate-orange: var(--rlm-orange);
+  --color-rate-red: var(--rlm-red);
+  --font-sans: var(--font-geist-sans);
+}
+
+/* App is dark-first regardless of system, matching product design */
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--rlm-bg);
+  color: var(--rlm-text);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Fixed ambient backdrop: faint grid + soft brand glows on pure black. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 82% -8%, rgba(255, 106, 43, 0.10), transparent 60%),
+    radial-gradient(800px 460px at -8% 12%, rgba(255, 45, 85, 0.07), transparent 58%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px) 0 0 / 64px 64px;
+  -webkit-mask-image: radial-gradient(circle at 50% 0%, black, transparent 85%);
+  mask-image: radial-gradient(circle at 50% 0%, black, transparent 85%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Single scroll owner = the document. Only block horizontal overflow so the
+   page always scrolls vertically as expected. */
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+/* Anchor targets sit below the fixed navbar. */
+section[id],
+[id='shop'],
+[id='about'],
+[id='health'],
+[id='contact'],
+[id='pricing'] {
+  scroll-margin-top: 6rem;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Respect reduced motion for smoother / accessible UX. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Gradient animation for buttons */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
+}
+
+/* ----------------------------------------------------------------------------
+   RLM design-system utilities
+   ------------------------------------------------------------------------- */
+
+/* Frosted glass surface used across dashboard cards */
+.rlm-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+  border: 1px solid var(--rlm-border);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(14px);
+}
+
+.rlm-card-hover {
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+.rlm-card-hover:hover {
+  border-color: rgba(255, 106, 43, 0.4);
+  box-shadow: 0 18px 50px -18px var(--rlm-accent-glow);
+}
+
+/* Animated conic gradient border wrapper. Put content in a child with its own
+   background; the parent shows a rotating brand-colored ring. */
+.rlm-gradient-border {
+  position: relative;
+  border-radius: 1.25rem;
+  background: var(--rlm-bg-elev);
+  isolation: isolate;
+}
+.rlm-gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--angle, 0deg), transparent 55%, var(--rlm-accent) 78%, var(--rlm-accent-2) 90%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rlm-rotate 6s linear infinite;
+  z-index: -1;
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes rlm-rotate {
+  to { --angle: 360deg; }
+}
+
+/* Eyebrow / section label pill */
+.rlm-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--rlm-border);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rlm-text-muted);
+}
+
+/* Shimmering headline sweep */
+@keyframes rlm-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.rlm-shimmer {
+  background: linear-gradient(100deg, #fff 30%, var(--rlm-accent) 50%, #fff 70%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rlm-shimmer 5s linear infinite;
+}
+
+/* Floating orb (decorative, animated) */
+@keyframes rlm-float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -18px, 0) scale(1.06); }
+}
+.rlm-orb { animation: rlm-float 9s ease-in-out infinite; will-change: transform; }
+
+/* Brand gradient text */
+.rlm-gradient-text {
+  background: linear-gradient(90deg, #FFB067, var(--rlm-accent), var(--rlm-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Primary CTA button */
+.rlm-btn-primary {
+  background: linear-gradient(90deg, var(--rlm-accent), var(--rlm-accent-2));
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.rlm-btn-primary:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 10px 30px -8px var(--rlm-accent-glow);
+}
+.rlm-btn-primary:active { transform: translateY(1px); }
+
+/* Rating dot colors */
+.rate-green { background: var(--rlm-green); box-shadow: 0 0 14px rgba(59, 217, 126, 0.55); }
+.rate-orange { background: var(--rlm-orange); box-shadow: 0 0 14px rgba(255, 162, 58, 0.55); }
+.rate-red { background: var(--rlm-red); box-shadow: 0 0 14px rgba(255, 90, 95, 0.55); }
+.rate-neutral { background: rgba(255, 255, 255, 0.12); }
+
+/* Subtle pulse for locked/interactive states */
+@keyframes rlm-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--rlm-accent-glow); }
+  50% { box-shadow: 0 0 0 6px rgba(255, 107, 44, 0); }
+}
+.rlm-pulse { animation: rlm-pulse-glow 2s infinite; }
+
+/* Hide scrollbars on horizontal tab strips */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Custom slim scrollbar for scroll areas */
+.rlm-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.rlm-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 999px; }
+.rlm-scroll::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes rlm-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rlm-fade-up { animation: rlm-fade-up 0.5s ease both; }
