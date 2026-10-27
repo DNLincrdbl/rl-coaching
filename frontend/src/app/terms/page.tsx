@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import RlmLogo from '@/app/components/RlmLogo';
 
 export const metadata: Metadata = {
   title: 'Felhasználási feltételek',
@@ -9,6 +10,9 @@ export default function TermsPage() {
   return (
     <main className="min-h-screen bg-black text-gray-300 px-4 py-24">
       <div className="max-w-2xl mx-auto space-y-6">
+        <Link href="/" className="inline-flex items-center" aria-label="RLM">
+          <RlmLogo height={48} />
+        </Link>
         <Link href="/" className="text-sm text-orange-400 hover:text-orange-300">
           ← Vissza a főoldalra
         </Link>

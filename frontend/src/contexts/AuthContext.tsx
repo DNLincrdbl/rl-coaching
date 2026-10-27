@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { AUTH_EXPIRED_EVENT } from '@/lib/toast';
 
 export interface AuthUser {
   id: number;
@@ -13,7 +14,10 @@ export interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<{ confirmToken?: string }>;
+  confirmEmail: (token: string) => Promise<void>;
+  confirmEmailChange: (token: string) => Promise<boolean>;
+  resendConfirmation: () => Promise<{ message: string; confirmToken?: string }>;
   signIn: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -48,9 +52,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })();
   }, [refresh]);
 
+  useEffect(() => {
+    const onExpired = () => setUser(null);
+    window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
+  }, []);
+
   const signUp = async (email: string, password: string, name: string) => {
-    const res = await api.post<{ user: AuthUser }>('/api/auth/register', { email, password, name });
+    const res = await api.post<{ user: AuthUser; confirmToken?: string }>('/api/auth/register', { email, password, name });
     setUser(toAuthUser(res.user));
+    if (res.confirmToken) {
+      try { sessionStorage.setItem('rlm-confirm-token', res.confirmToken); } catch { /* ignore */ }
+    }
+    return { confirmToken: res.confirmToken };
+  };
+
+  const confirmEmail = async (token: string) => {
+    const res = await api.post<{ user: AuthUser }>('/api/auth/confirm-email', { token });
+    setUser(toAuthUser(res.user));
+    try { sessionStorage.removeItem('rlm-confirm-token'); } catch { /* ignore */ }
+    window.dispatchEvent(new Event('rlm-profile-refresh'));
+  };
+
+  const confirmEmailChange = async (token: string) => {
+    const res = await api.post<{ user?: AuthUser; message?: string }>('/api/account/email/confirm', { token });
+    if (res.user) {
+      setUser(toAuthUser(res.user));
+      window.dispatchEvent(new Event('rlm-profile-refresh'));
+      return true;
+    }
+    return false;
+  };
+
+  const resendConfirmation = async () => {
+    return api.post<{ message: string; confirmToken?: string }>('/api/auth/resend-confirmation');
   };
 
   const signIn = async (email: string, password: string) => {
@@ -85,6 +120,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refresh,
     forgotPassword,
     resetPassword,
+    confirmEmail,
+    confirmEmailChange,
+    resendConfirmation,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -3,30 +3,74 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import AuthModal from './AuthModal';
 import CartDrawer from './CartDrawer';
 import CheckoutModal from './CheckoutModal';
 import { FaUser, FaSignOutAlt, FaShoppingCart } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { errorMessage, showToast } from '@/lib/toast';
+import RlmLogo from './RlmLogo';
+
+const handledEmailChanges = new Set<string>();
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, loading, logout, confirmEmail, confirmEmailChange } = useAuth();
   const { count, openCart } = useCart();
   const router = useRouter();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Open the login modal automatically when redirected with ?login=1
-  // (e.g. from the dashboard auth guard). Reading window avoids needing a
-  // Suspense boundary for useSearchParams.
   useEffect(() => {
-    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('login') === '1' && !user) {
+    if (typeof window === 'undefined' || loading) return;
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('login') === '1') {
+      q.delete('login');
+      const cleaned = `${window.location.pathname}${q.toString() ? `?${q}` : ''}${window.location.hash}`;
+      window.history.replaceState({}, '', cleaned);
+      if (!user) setIsAuthModalOpen(true);
+    }
+    const reset = q.get('reset');
+    if (reset && reset !== '1') {
       setIsAuthModalOpen(true);
     }
-  }, [user]);
+    const confirm = q.get('confirm');
+    if (confirm === 'error') {
+      showToast('A megerősítő link érvénytelen vagy lejárt.');
+      q.delete('confirm');
+      const next = `${window.location.pathname}${q.toString() ? `?${q}` : ''}`;
+      window.history.replaceState({}, '', next);
+      return;
+    }
+    if (confirm && confirm !== '1') {
+      void confirmEmail(confirm)
+        .then(() => {
+          showToast('E-mail cím megerősítve.', 'success');
+          router.push('/dashboard');
+        })
+        .catch((e) => showToast(errorMessage(e, 'A megerősítés nem sikerült.')))
+        .finally(() => {
+          q.delete('confirm');
+          const next = `${window.location.pathname}${q.toString() ? `?${q}` : ''}`;
+          window.history.replaceState({}, '', next);
+        });
+    }
+    const emailChange = q.get('emailChange');
+    if (emailChange && emailChange !== '1' && !handledEmailChanges.has(emailChange)) {
+      handledEmailChanges.add(emailChange);
+      q.delete('emailChange');
+      const cleaned = `${window.location.pathname}${q.toString() ? `?${q}` : ''}`;
+      window.history.replaceState({}, '', cleaned);
+      void confirmEmailChange(emailChange)
+        .then((signedIn) => {
+          showToast('Az új e-mail cím megerősítve.', 'success');
+          if (signedIn) router.push('/dashboard/settings');
+          else setIsAuthModalOpen(true);
+        })
+        .catch((e) => showToast(errorMessage(e, 'A megerősítés nem sikerült.')));
+    }
+  }, [user, loading, confirmEmail, confirmEmailChange, router]);
 
   const handleLoginSuccess = () => {
     setIsAuthModalOpen(false);
@@ -55,220 +99,175 @@ const Navbar = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   };
 
+  const navLink = 'text-[13px] font-medium text-white/65 transition hover:text-white';
+
   return (
     <>
-      <nav className="fixed w-full z-[100] bg-black/70 backdrop-blur-xl border-b border-white/5">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-20">
-            <button 
-              onClick={scrollToTop}
-              className="group relative"
-            >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative"
-              >
-                <span className="text-3xl font-black bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 text-transparent bg-clip-text">
-                  JusTZoly
-                </span>
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-400/20 via-red-500/20 to-orange-400/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </motion.div>
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-[100] px-3 pt-3 md:px-5 md:pt-4">
+        <nav className="pointer-events-auto mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 rounded-full border border-white/15 bg-black/55 px-3 backdrop-blur-xl md:h-[3.6rem] md:px-4">
+          <button onClick={scrollToTop} className="shrink-0 pl-1" aria-label="RLM">
+            <RlmLogo height={32} priority />
+          </button>
+
+          <div className="hidden items-center gap-7 md:flex">
+            <button type="button" onClick={() => smoothScrollTo('shop')} className={navLink}>
+              Digitális termékek
             </button>
-            
-            {/* Mobile controls */}
-            <div className="flex items-center gap-3 md:hidden">
-              <button
-                onClick={openCart}
-                aria-label="Kosár megnyitása"
-                className="relative inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-              >
-                <FaShoppingCart className="w-5 h-5" />
-                {count > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-[11px] font-bold text-white flex items-center justify-center">
-                    {count}
-                  </span>
-                )}
-              </button>
-              <button
-                aria-label="Menü megnyitása"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-              >
-                <span className="sr-only">Menu</span>
-                <div className="relative w-6 h-6 text-current">
-                  <span className={`absolute left-0 top-1 block h-0.5 w-6 bg-current transition-transform ${isMobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
-                  <span className={`absolute left-0 top-3 block h-0.5 w-6 bg-current transition-opacity ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
-                  <span className={`absolute left-0 top-5 block h-0.5 w-6 bg-current transition-transform ${isMobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
-                </div>
-              </button>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={() => smoothScrollTo('shop')}
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Digitális termékek
-              </button>
-              <button 
-                onClick={() => smoothScrollTo('about')}
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Rólam
-              </button>
-              <button 
-                onClick={() => smoothScrollTo('contact')}
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Kapcsolat
-              </button>
-
-              <button
-                onClick={openCart}
-                aria-label="Kosár megnyitása"
-                className="relative p-2.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
-              >
-                <FaShoppingCart className="w-5 h-5" />
-                {count > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-[11px] font-bold text-white flex items-center justify-center">
-                    {count}
-                  </span>
-                )}
-              </button>
-
-              {user ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
-                  >
-                    <FaUser className="w-5 h-5" />
-                    <span className="text-sm font-medium">{user.displayName || 'Profil'}</span>
-                  </button>
-
-                  {/* Profile Menu */}
-                  {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-[#0A0A0C] border border-white/10 rounded-xl shadow-xl z-50">
-                      <Link
-                        href="/dashboard"
-                        className="block px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors border-b border-white/5"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                      >
-                        <span className="flex items-center gap-2">
-                          <FaUser className="w-4 h-4 text-gray-400" />
-                          Profil
-                        </span>
-                      </Link>
-                      <Link
-                        href="/dashboard"
-                        className="block px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span className="text-orange-500">🚀</span>
-                          Rocket League Mesterfokon
-                        </span>
-                      </Link>
-                      <Link
-                        href="#"
-                        className="block px-4 py-3 text-sm text-gray-500 cursor-not-allowed"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>💪</span>
-                          JusTZoly Edzésprogram
-                          <span className="text-xs bg-white/10 px-1.5 py-0.5 rounded ml-auto">Hamarosan</span>
-                        </span>
-                      </Link>
-                      <Link
-                        href="#"
-                        className="block px-4 py-3 text-sm text-gray-500 cursor-not-allowed border-b border-white/5"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>📖</span>
-                          JusTZoly Receptkönyv
-                          <span className="text-xs bg-white/10 px-1.5 py-0.5 rounded ml-auto">Hamarosan</span>
-                        </span>
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-white/5 transition-colors flex items-center gap-2"
-                      >
-                        <FaSignOutAlt className="w-4 h-4" />
-                        Kijelentkezés
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="px-6 py-2.5 bg-white/10 rounded-lg text-sm font-medium hover:bg-white/20 transition-all"
-                  >
-                    Bejelentkezés
-                  </motion.button>
-                </div>
-              )}
-            </div>
+            <button type="button" onClick={() => smoothScrollTo('about')} className={navLink}>
+              Rólam
+            </button>
+            <button type="button" onClick={() => smoothScrollTo('contact')} className={navLink}>
+              Kapcsolat
+            </button>
           </div>
-        </div>
-      </nav>
 
-      {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-20 inset-x-0 z-[100] bg-black/90 backdrop-blur-xl border-b border-white/10">
-          <div className="container mx-auto px-4 py-4 space-y-2">
-            <button 
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={openCart}
+              aria-label="Kosár megnyitása"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white transition hover:border-white/40"
+            >
+              <FaShoppingCart className="h-3.5 w-3.5" />
+              {count > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-black">
+                  {count}
+                </span>
+              )}
+            </button>
+
+            {user ? (
+              <div className="relative hidden md:block">
+                <button
+                  type="button"
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black"
+                >
+                  <FaUser className="h-3.5 w-3.5" />
+                  <span className="max-w-[8rem] truncate">{user.displayName || 'Profil'}</span>
+                </button>
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0C] shadow-2xl">
+                    <Link
+                      href="/dashboard"
+                      className="block border-b border-white/5 px-4 py-3 text-sm text-white hover:bg-white/5"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      <span className="flex items-center gap-2">
+                        <FaUser className="h-4 w-4 text-white/40" />
+                        Profil
+                      </span>
+                    </Link>
+                    <Link
+                      href="/dashboard"
+                      className="block px-4 py-3 text-sm text-white hover:bg-white/5"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      Rocket League Mesterfokon
+                    </Link>
+                    <span className="flex items-center gap-2 px-4 py-3 text-sm text-white/35">
+                      JusTZoly Edzésprogram
+                      <span className="ml-auto rounded bg-white/10 px-1.5 py-0.5 text-[10px]">Hamarosan</span>
+                    </span>
+                    <span className="flex items-center gap-2 border-b border-white/5 px-4 py-3 text-sm text-white/35">
+                      JusTZoly Receptkönyv
+                      <span className="ml-auto rounded bg-white/10 px-1.5 py-0.5 text-[10px]">Hamarosan</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-white/5"
+                    >
+                      <FaSignOutAlt className="h-4 w-4" />
+                      Kijelentkezés
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAuthModalOpen(true)}
+                className="hidden rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/90 md:inline-flex"
+              >
+                Bejelentkezés
+              </button>
+            )}
+
+            <button
+              type="button"
+              aria-label="Menü megnyitása"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 md:hidden"
+            >
+              <span className="relative block h-3 w-4">
+                <span className={`absolute left-0 top-0 block h-px w-4 bg-white transition ${isMobileMenuOpen ? 'top-1.5 rotate-45' : ''}`} />
+                <span className={`absolute left-0 top-1.5 block h-px w-4 bg-white transition ${isMobileMenuOpen ? 'opacity-0' : ''}`} />
+                <span className={`absolute left-0 top-3 block h-px w-4 bg-white transition ${isMobileMenuOpen ? 'top-1.5 -rotate-45' : ''}`} />
+              </span>
+            </button>
+          </div>
+        </nav>
+
+        {isMobileMenuOpen && (
+          <div className="pointer-events-auto mx-auto mt-2 max-w-6xl rounded-3xl border border-white/10 bg-black/90 p-2 backdrop-blur-xl md:hidden">
+            <button
+              type="button"
               onClick={() => { smoothScrollTo('shop'); setIsMobileMenuOpen(false); }}
-              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
+              className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-white/80 hover:bg-white/5"
             >
               Digitális termékek
             </button>
-            <button 
+            <button
+              type="button"
               onClick={() => { smoothScrollTo('about'); setIsMobileMenuOpen(false); }}
-              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
+              className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-white/80 hover:bg-white/5"
             >
               Rólam
             </button>
-            <button 
+            <button
+              type="button"
               onClick={() => { smoothScrollTo('contact'); setIsMobileMenuOpen(false); }}
-              className="block w-full text-left px-3 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
+              className="block w-full rounded-2xl px-4 py-3 text-left text-sm text-white/80 hover:bg-white/5"
             >
               Kapcsolat
             </button>
-            <div className="pt-2">
+            <div className="p-2">
               {user ? (
-                <button onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }} className="w-full px-3 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-white/5 flex items-center gap-2">
-                  <FaSignOutAlt className="w-4 h-4" /> Kijelentkezés
+                <button
+                  type="button"
+                  onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}
+                  className="flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-sm text-red-400 hover:bg-white/5"
+                >
+                  <FaSignOutAlt className="h-4 w-4" /> Kijelentkezés
                 </button>
               ) : (
-                <button onClick={() => { setIsMobileMenuOpen(false); setIsAuthModalOpen(true); }} className="w-full px-3 py-3 rounded-lg text-sm font-medium bg-white/10 hover:bg-white/20">
+                <button
+                  type="button"
+                  onClick={() => { setIsMobileMenuOpen(false); setIsAuthModalOpen(true); }}
+                  className="w-full rounded-full bg-white py-3 text-sm font-semibold text-black"
+                >
                   Bejelentkezés
                 </button>
               )}
             </div>
           </div>
-        </div>
-      )}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
+        )}
+      </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />
-
       <CartDrawer />
       <CheckoutModal />
     </>
   );
 };
 
-export default Navbar; 
+export default Navbar;

@@ -22,6 +22,7 @@ backend/*.db-journal
 backend/venv/
 backend/.venv/
 backend/uploads/
+backend/mail_outbox/
 __pycache__/
 *.pyc
 

@@ -39,7 +39,7 @@ export default function BeforeAfterSlider() {
 
   return (
     <div 
-      className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gray-100 dark:bg-gray-800 group"
+      className="relative w-full h-full overflow-hidden bg-black group"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -93,8 +93,8 @@ export default function BeforeAfterSlider() {
             onClick={() => setCurrentIndex(index)}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
               index === currentIndex 
-                ? 'bg-green-500 w-4' 
-                : 'bg-white/60 hover:bg-white/80'
+                ? 'bg-white w-4' 
+                : 'bg-white/40 hover:bg-white/70'
             }`}
           />
         ))}

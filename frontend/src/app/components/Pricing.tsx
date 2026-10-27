@@ -2,50 +2,52 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaCheck, FaRocket, FaCrown, FaShoppingCart } from 'react-icons/fa';
+import { FaCheck } from 'react-icons/fa';
 import { useCart } from '@/contexts/CartContext';
 import { parseHuf } from '@/lib/data/products';
 
 interface Tier {
   id: string;
+  index: string;
   name: string;
   price: string;
   period: string;
   highlight?: boolean;
-  icon: React.ElementType;
   features: { text: string; included: boolean }[];
   cta: string;
 }
 
 const TIERS: Tier[] = [
   {
-    id: 'basic',
-    name: 'Alap tagság',
+    id: 'rlm',
+    index: '01',
+    name: 'RLM',
     price: '1.990',
     period: 'Ft / hó',
-    icon: FaRocket,
     features: [
       { text: 'Teljes kurzus- és tutoriál-hozzáférés', included: true },
       { text: 'Aréna Tree (Dribble & Aerial)', included: true },
-      { text: 'Leaderboard részvétel', included: true },
-      { text: 'Coaching / replay elemzés', included: false },
+      { text: 'Leaderboard (20 tagnál nyílik)', included: true },
+      { text: 'Hibajelentés', included: true },
+      { text: 'Havi replay elemzés', included: false },
     ],
-    cta: 'Alap választása',
+    cta: 'RLM választása',
   },
   {
-    id: 'pro',
-    name: 'Rocket League Mesterfokon',
+    id: 'rlm_plus',
+    index: '02',
+    name: 'RLM+',
     price: '7.990',
     period: 'Ft / hó',
     highlight: true,
-    icon: FaCrown,
     features: [
-      { text: 'Minden az Alap tagságból', included: true },
-      { text: 'Havi 1 személyre szabott coaching', included: true },
-      { text: 'Részletes replay elemzés (sheet)', included: true },
-      { text: 'Discord egyeztetés a coaching alatt', included: true },
+      { text: 'Minden az RLM-ből', included: true },
+      { text: 'Havi 1 személyre szabott replay elemzés', included: true },
+      { text: 'RLM+ Replay Elemzések (publikus / privát)', included: true },
+      { text: 'Extra replay kredit 5.990 Ft-ért', included: true },
+      { text: 'Discord egyeztetés a replay elemzéshez', included: true },
     ],
-    cta: 'PRO választása',
+    cta: 'RLM+ választása',
   },
 ];
 
@@ -63,71 +65,84 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="relative py-24 px-4">
-      <div className="container mx-auto max-w-5xl">
-        <div className="text-center mb-14">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl font-black text-white mb-3"
-          >
-            Válaszd ki a <span className="rlm-gradient-text">tagságod</span>
-          </motion.h2>
-          <p className="text-gray-400 max-w-xl mx-auto">
-            Kezdd az alapokkal, vagy vágj bele a teljes mesterképzésbe személyes coachinggal.
+    <section id="pricing" className="pt-24 md:pt-36">
+      <div className="mx-auto max-w-6xl px-4 md:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.32em] text-white/40">Tagság</p>
+          <h2 className="max-w-4xl text-[clamp(3rem,8vw,7rem)] font-black leading-[0.86] tracking-[-0.05em] text-white">
+            Válaszd ki
+            <br />
+            a tagságod.
+          </h2>
+          <p className="mt-6 max-w-md text-base leading-relaxed text-white/50 md:text-lg">
+            Kezdd az RLM-mel, vagy lépj RLM+-ra havi replay elemzéssel.
           </p>
-        </div>
+        </motion.div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {TIERS.map((tier, i) => (
-            <motion.div
-              key={tier.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative rlm-card p-8 ${tier.highlight ? 'border-orange-500/40 shadow-2xl shadow-orange-500/10' : ''}`}
-            >
-              {tier.highlight && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rlm-btn-primary px-4 py-1 text-xs font-bold">
-                  Legnépszerűbb
-                </span>
-              )}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`p-3 rounded-xl ${tier.highlight ? 'bg-gradient-to-br from-orange-500 to-red-500' : 'bg-white/10'}`}>
-                  <tier.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white">{tier.name}</h3>
-              </div>
-              <div className="mb-6">
-                <span className="text-4xl font-black text-white">{tier.price}</span>
-                <span className="text-gray-400 ml-2">{tier.period}</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {tier.features.map((f, idx) => (
-                  <li key={idx} className={`flex items-center gap-3 ${f.included ? 'text-gray-200' : 'text-gray-600 line-through'}`}>
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${f.included ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-gray-600'}`}>
-                      <FaCheck className="w-2.5 h-2.5" />
+      <div className="mt-14 border-t border-white/15 md:mt-20">
+        {TIERS.map((tier) => (
+          <article
+            key={tier.id}
+            className="group border-b border-white/15 transition-colors duration-300 md:hover:bg-white"
+          >
+            <div className="mx-auto grid max-w-6xl items-end gap-8 px-4 py-10 md:grid-cols-12 md:px-8 md:py-14">
+              <div className="md:col-span-5">
+                <div className="flex items-center gap-3">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/40 group-hover:text-black/45">{tier.index}</p>
+                  {tier.highlight && (
+                    <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-black group-hover:bg-black group-hover:text-white">
+                      Legnépszerűbb
                     </span>
+                  )}
+                </div>
+                <h3 className="mt-3 text-[clamp(3.5rem,7vw,6.5rem)] font-black leading-[0.85] tracking-[-0.05em] text-white group-hover:text-black">
+                  {tier.name}
+                </h3>
+                <p className="mt-4 flex items-end gap-2 text-white group-hover:text-black">
+                  <span className="text-4xl font-black tracking-tight md:text-5xl">{tier.price}</span>
+                  <span className="mb-1 text-sm text-white/45 group-hover:text-black/50">{tier.period}</span>
+                </p>
+              </div>
+
+              <ul className="space-y-2.5 md:col-span-4">
+                {tier.features.map((f) => (
+                  <li
+                    key={f.text}
+                    className={`flex items-start gap-3 text-sm leading-snug ${
+                      f.included
+                        ? 'text-white/80 group-hover:text-black/80'
+                        : 'text-white/30 line-through group-hover:text-black/30'
+                    }`}
+                  >
+                    <FaCheck className={`mt-1 h-2.5 w-2.5 shrink-0 ${f.included ? 'text-white group-hover:text-black' : 'text-white/25 group-hover:text-black/25'}`} />
                     {f.text}
                   </li>
                 ))}
               </ul>
-              <button
-                onClick={() => addTier(tier)}
-                className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${tier.highlight ? 'rlm-btn-primary' : 'bg-white/10 text-white hover:bg-white/20'}`}
-              >
-                <FaShoppingCart className="w-4 h-4" /> {tier.cta}
-              </button>
-            </motion.div>
-          ))}
-        </div>
 
-        <p className="text-center text-sm text-gray-500 mt-8">
-          PRO tagoknak: extra replay elemzés bármikor megvásárolható <span className="text-gray-300 font-medium">4.990 Ft</span> áron, ha nem szeretnél a havi körre várni.
-        </p>
+              <div className="md:col-span-3 md:justify-self-end">
+                <button
+                  type="button"
+                  onClick={() => addTier(tier)}
+                  className="w-full rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-black transition group-hover:bg-black group-hover:text-white md:w-auto"
+                >
+                  {tier.cta}
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
+
+      <p className="mx-auto max-w-6xl px-4 py-8 text-sm text-white/40 md:px-8">
+        RLM+ tagoknak: extra replay elemzés bármikor megvásárolható <span className="text-white/70">5.990 Ft</span> áron, a kreditek gyűlnek.
+      </p>
     </section>
   );
 }

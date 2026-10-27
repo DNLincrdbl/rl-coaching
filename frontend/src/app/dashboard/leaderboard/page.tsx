@@ -1,19 +1,27 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useCallback, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   FaTrophy,
   FaMedal,
   FaProjectDiagram,
-  FaTimes,
   FaCrown,
   FaBullseye,
   FaRocket,
   FaCog,
+  FaLock,
 } from 'react-icons/fa';
 import { IconType } from 'react-icons';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { errorMessage } from '@/lib/toast';
+import { useRLM } from '@/contexts/RLMContext';
+import { titleById } from '@/lib/data/cosmetics';
+import { ArenaBadge } from '@/lib/data/arenaBadges';
+import ProfileAvatar from '../components/ProfileAvatar';
+import ArenaRankBadge from '../components/ArenaRankBadge';
+import { ErrorBanner } from '@/app/components/PageError';
 
 interface LBPlayer {
   id: number;
@@ -24,6 +32,8 @@ interface LBPlayer {
   score: number;
   badge: IconType;
   banner: string;
+  avatarColor: string;
+  arenaBadge: ArenaBadge | null;
 }
 
 interface LBRow {
@@ -31,9 +41,13 @@ interface LBRow {
   position: number;
   name: string;
   rank: string | null;
+  level?: number;
   arenaLevel: number;
   score: number;
   badge: string | null;
+  arenaBadge?: ArenaBadge | null;
+  title?: string | null;
+  avatarColor?: string;
 }
 
 const BADGE_ICONS: Record<string, IconType> = {
@@ -65,63 +79,19 @@ function titleForLevel(level: number): string {
 }
 
 function toPlayer(row: LBRow): LBPlayer {
+  const equipped = titleById(row.title);
   return {
     id: row.id,
     name: row.name,
-    title: titleForLevel(row.arenaLevel),
+    title: equipped?.name || titleForLevel(row.arenaLevel),
     rank: row.rank || '—',
     arenaLevel: row.arenaLevel,
     score: row.score,
     badge: BADGE_ICONS[row.badge || 'rookie'] || FaMedal,
     banner: BANNERS[(row.position - 1) % BANNERS.length],
+    avatarColor: row.avatarColor || 'black',
+    arenaBadge: row.arenaBadge ?? null,
   };
-}
-
-function PlayerProfileModal({ player, onClose }: { player: LBPlayer; onClose: () => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="rlm-card w-full max-w-sm overflow-hidden"
-      >
-        <div className="h-24 relative" style={{ background: player.banner }}>
-          <button onClick={onClose} className="absolute top-3 right-3 p-2 bg-black/40 rounded-full hover:bg-black/60">
-            <FaTimes className="w-4 h-4 text-white" />
-          </button>
-        </div>
-        <div className="p-6 pt-0">
-          <div className="w-20 h-20 -mt-10 rounded-2xl bg-[#0A0A0C] border border-white/10 flex items-center justify-center shadow-lg">
-            <player.badge className="w-9 h-9 text-orange-400" />
-          </div>
-          <h3 className="text-xl font-bold text-white mt-3">{player.name}</h3>
-          <p className="text-orange-400 text-sm font-medium">{player.title}</p>
-          <div className="grid grid-cols-3 gap-3 mt-5">
-            <div className="rlm-card p-3 text-center">
-              <p className="text-lg font-bold text-white">{player.arenaLevel}</p>
-              <p className="text-[10px] text-gray-500 uppercase">Aréna szint</p>
-            </div>
-            <div className="rlm-card p-3 text-center">
-              <p className="text-lg font-bold rlm-gradient-text">{player.score}</p>
-              <p className="text-[10px] text-gray-500 uppercase">XP</p>
-            </div>
-            <div className="rlm-card p-3 text-center">
-              <p className="text-sm font-bold text-white leading-tight">{player.rank}</p>
-              <p className="text-[10px] text-gray-500 uppercase">Rang</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
 }
 
 function RankBadge({ rank }: { rank: number }) {
@@ -174,8 +144,8 @@ function LeaderboardRow({ player, position, index, isOwn, onClick }: {
         <RankBadge rank={position} />
 
         <div className="flex-1 flex items-center gap-4 p-3 rounded-xl" style={{ background: player.banner }}>
-          <div className="w-12 h-12 rounded-xl bg-black/40 backdrop-blur flex items-center justify-center border border-white/25">
-            <player.badge className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/25">
+            <ProfileAvatar colorId={player.avatarColor} size={48} rounded="rounded-xl" />
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-bold text-white drop-shadow-md flex items-center gap-2">
@@ -194,44 +164,66 @@ function LeaderboardRow({ player, position, index, isOwn, onClick }: {
           <p className="text-xs text-gray-500 uppercase tracking-wide">Aréna szint</p>
           <p className="text-2xl font-bold rlm-gradient-text">{player.arenaLevel}</p>
         </div>
+        {player.arenaBadge && (
+          <div className="hidden md:block">
+            <ArenaRankBadge badge={player.arenaBadge} size={40} />
+          </div>
+        )}
       </div>
     </motion.button>
   );
 }
 
 export default function LeaderboardPage() {
-  const [selected, setSelected] = useState<LBPlayer | null>(null);
+  const { profile } = useRLM();
+  const router = useRouter();
   const [top, setTop] = useState<{ player: LBPlayer; position: number }[]>([]);
   const [me, setMe] = useState<{ player: LBPlayer; position: number } | null>(null);
+  const [unlocked, setUnlocked] = useState(true);
+  const [meta, setMeta] = useState({ memberCount: 0, threshold: 20 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
+  const load = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    void (async () => {
       try {
-        const res = await api.get<{ top: LBRow[]; me: LBRow | null }>('/api/leaderboard');
+        const res = await api.get<{
+          top: LBRow[];
+          me: LBRow | null;
+          unlocked?: boolean;
+          memberCount?: number;
+          leaderboardUnlockThreshold?: number;
+        }>('/api/leaderboard');
+        setUnlocked(res.unlocked !== false);
+        setMeta({
+          memberCount: res.memberCount ?? profile.features.memberCount,
+          threshold: res.leaderboardUnlockThreshold ?? 20,
+        });
         setTop(res.top.map((r) => ({ player: toPlayer(r), position: r.position })));
         setMe(res.me ? { player: toPlayer(res.me), position: res.me.position } : null);
-      } catch {
-        /* ignore */
+      } catch (e) {
+        setError(errorMessage(e, 'Nem sikerült betölteni a leaderboardot.'));
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [profile.features.memberCount]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return (
     <div className="space-y-6 rlm-fade-up">
-      <AnimatePresence>
-        {selected && <PlayerProfileModal player={selected} onClose={() => setSelected(null)} />}
-      </AnimatePresence>
-
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center gap-3">
             <FaTrophy className="text-yellow-500" /> Leaderboard
           </h1>
           <p className="text-gray-400 mt-1 flex items-center gap-2">
-            <FaProjectDiagram className="w-3.5 h-3.5" /> Aréna Tree teljesítmény · havonta frissül
+            <FaProjectDiagram className="w-3.5 h-3.5" /> Aréna teljesítmény · havonta frissül · döntetlennél a korábbi beküldés nyer
           </p>
         </div>
       </div>
@@ -239,6 +231,15 @@ export default function LeaderboardPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-orange-500" />
+        </div>
+      ) : error ? (
+        <ErrorBanner message={error} onRetry={load} />
+      ) : !unlocked ? (
+        <div className="flex flex-col items-center py-16 text-center">
+          <FaLock className="w-10 h-10 text-gray-500 mb-4" />
+          <p className="text-gray-400 max-w-md">
+            A leaderboard {meta.threshold} tagnál nyílik. Most {meta.memberCount} tag van.
+          </p>
         </div>
       ) : (
         <>
@@ -249,7 +250,7 @@ export default function LeaderboardPage() {
                 player={player}
                 position={position}
                 index={index}
-                onClick={() => setSelected(player)}
+                onClick={() => router.push(`/dashboard/player/${player.id}`)}
               />
             ))}
           </div>
@@ -262,7 +263,7 @@ export default function LeaderboardPage() {
                 position={me.position}
                 index={0}
                 isOwn
-                onClick={() => setSelected(me.player)}
+                onClick={() => router.push(`/dashboard/player/${me.player.id}`)}
               />
             </div>
           )}

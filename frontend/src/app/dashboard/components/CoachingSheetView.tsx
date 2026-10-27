@@ -26,8 +26,10 @@ import {
   TopicRating,
   SheetTimestamp,
   formatTimestamp,
+  canonColor,
 } from '@/lib/data/coaching';
 import { resolveVideoUrl } from '@/lib/api';
+import { errorMessage } from '@/lib/toast';
 
 interface Props {
   sheet: CoachingSheet;
@@ -45,13 +47,13 @@ interface Props {
   timestampsMaxHeightClass?: string;
   /** When true, the whole view is laid out to fit its container height (no page scroll). */
   fitViewport?: boolean;
-  onChange?: (sheet: CoachingSheet) => void;
+  onChange?: (sheet: CoachingSheet) => void | Promise<void>;
   onTogglePublish?: (published: boolean) => void;
   /** Called on save when hideHeader is used (host renders the save button). */
   onSaveRef?: (save: () => void) => void;
 }
 
-const COLOR_CYCLE: RatingColor[] = ['green', 'orange', 'red'];
+const COLOR_CYCLE: RatingColor[] = ['green', 'yellow', 'red'];
 
 export default function CoachingSheetView({
   sheet,
@@ -76,6 +78,8 @@ export default function CoachingSheetView({
   const [isEditing, setIsEditing] = useState(startEditing);
   const [draft, setDraft] = useState<CoachingSheet>(sheet);
   const [videoError, setVideoError] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const [focusTsId, setFocusTsId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -131,8 +135,8 @@ export default function CoachingSheetView({
       ...d,
       ratings: d.ratings.map((r) => {
         if (r.topic !== topic) return r;
-        const idx = COLOR_CYCLE.indexOf(r.color as RatingColor);
-        const next = COLOR_CYCLE[(idx + 1) % COLOR_CYCLE.length];
+        const idx = COLOR_CYCLE.indexOf(canonColor(r.color) as RatingColor);
+        const next = COLOR_CYCLE[(Math.max(0, idx) + 1) % COLOR_CYCLE.length];
         return { ...r, color: next };
       }),
     }));
@@ -167,9 +171,17 @@ export default function CoachingSheetView({
     setDraft((d) => ({ ...d, timestamps: d.timestamps.filter((t) => t.id !== id) }));
   };
 
-  const saveEdits = () => {
-    onChange?.(draft);
-    setIsEditing(false);
+  const saveEdits = async () => {
+    setSaveError(null);
+    setSaving(true);
+    try {
+      await onChange?.(draft);
+      setIsEditing(false);
+    } catch (e) {
+      setSaveError(errorMessage(e, 'A mentés nem sikerült.'));
+    } finally {
+      setSaving(false);
+    }
   };
 
   useEffect(() => {
@@ -180,10 +192,14 @@ export default function CoachingSheetView({
   const cancelEdits = () => {
     setDraft(sheet);
     setIsEditing(false);
+    setSaveError(null);
   };
 
-  const ratingFor = (topic: RatingTopicId): TopicRating =>
-    current.ratings.find((r) => r.topic === topic) ?? { topic, color: 'neutral' };
+  const ratingFor = (topic: RatingTopicId): TopicRating => {
+    const found = current.ratings.find((r) => r.topic === topic || (topic === 'speed_boost' && r.topic === 'recovery_speed'));
+    if (!found) return { topic, color: 'neutral' };
+    return { ...found, color: canonColor(found.color) };
+  };
 
   return (
     <div className={fitViewport ? 'h-full flex flex-col gap-4 min-h-0' : 'space-y-6'}>
@@ -234,13 +250,23 @@ export default function CoachingSheetView({
                   <FaTimes className="w-3.5 h-3.5" /> Mégse
                 </button>
               )}
-              <button onClick={saveEdits} className="rlm-btn-primary flex items-center gap-2 px-4 py-2 text-sm">
-                <FaCheck className="w-3.5 h-3.5" /> {saveLabel}
+              <button
+                onClick={() => void saveEdits()}
+                disabled={saving}
+                className="rlm-btn-primary flex items-center gap-2 px-4 py-2 text-sm disabled:opacity-40"
+              >
+                <FaCheck className="w-3.5 h-3.5" /> {saving ? 'Mentés...' : saveLabel}
               </button>
             </>
           )}
         </div>
       </div>
+      )}
+
+      {saveError && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20" role="alert">
+          <p className="text-red-400 text-sm">{saveError}</p>
+        </div>
       )}
 
       <div className={fitViewport ? 'flex-1 min-h-0 flex flex-col lg:flex-row gap-6' : 'grid grid-cols-1 lg:grid-cols-3 gap-6'}>
@@ -365,7 +391,7 @@ export default function CoachingSheetView({
             <div className="space-y-3">
               {RATING_TOPICS.map((topic) => {
                 const rating = ratingFor(topic.id);
-                const meta = RATING_COLOR_META[rating.color];
+                const meta = RATING_COLOR_META[canonColor(rating.color)];
                 const isActive = activeTopic === topic.id;
                 return (
                   <div
@@ -399,7 +425,7 @@ export default function CoachingSheetView({
                     </div>
 
                     {/* Biggest mistake for orange/red */}
-                    {(rating.color === 'orange' || rating.color === 'red') && (
+                    {(canonColor(rating.color) === 'yellow' || rating.color === 'red') && (
                       <div className="mt-2 pl-7">
                         {isEditing ? (
                           <input

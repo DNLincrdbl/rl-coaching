@@ -19,6 +19,8 @@ export interface Course {
   description: string;
   image: string;
   category: CourseCategory;
+  /** Rank range this course is most useful for. */
+  rankRange: string;
   lessons: Lesson[];
 }
 
@@ -39,6 +41,7 @@ export const COURSES: Course[] = [
     description: 'Alapok, rotáció, pozícionálás és mechanikák kezdőknek.',
     image: '/kurzus-bronz-plat.jpg',
     category: 'bronze-plat',
+    rankRange: 'Bronze – Platinum',
     lessons: lessons('bp', 'Kurzus bemutató — mit fogsz tanulni?', [
       'Autó irányítás alapjai',
       'Boost menedzsment',
@@ -56,6 +59,7 @@ export const COURSES: Course[] = [
     description: 'Haladó mechanikák, csapatkoordináció és játékolvasás.',
     image: '/kurzus-dia-gc.jpg',
     category: 'dia-gc',
+    rankRange: 'Diamond – GC',
     lessons: lessons('dg', 'Kurzus bemutató — a következő szint', [
       'Haladó aerial kontroll',
       'Fast aerial technika',
@@ -73,6 +77,7 @@ export const COURSES: Course[] = [
     description: 'Pro szintű mechanikák, játékelemzés és versenyfelkészülés.',
     image: '/kurzus-gc2-ssl.jpg',
     category: 'gc2-ssl',
+    rankRange: 'GC2 – SSL',
     lessons: lessons('gs', 'Kurzus bemutató — a csúcsra', [
       'Pro szintű air roll',
       'Ceiling shots mastery',
@@ -90,6 +95,7 @@ export const COURSES: Course[] = [
     description: 'Tilt kezelés, koncentráció és versenyhelyzetek.',
     image: '/kurzus-mentál.jpg',
     category: 'mental',
+    rankRange: 'Minden rang',
     lessons: lessons('m', 'Kurzus bemutató — a fejben dől el', [
       'Mi a tilt és honnan jön?',
       'Tilt megelőzése',
@@ -170,6 +176,12 @@ export const TUTORIALS: Tutorial[] = [
   // Kickoff
   tut('t30', 'Basic Kickoff', 'Kickoff alapok.', 'Kickoff', '8:00', 1, 5),
   tut('t31', 'Speed Flip Kickoff', 'Speed flip kickoff.', 'Kickoff', '12:00', 4, 5),
+  tut('t32', 'Fake Kickoff', 'Fake kickoff időzítés.', 'Kickoff', '9:30', 3, 4),
+  tut('t33', 'Demo Awareness', 'Demók olvasása és elkerülése.', 'Defense', '11:00', 3, 5),
+  tut('t34', 'Boost Steal Routes', 'Boost lopás 2v2-ben.', 'Boost', '10:45', 3, 4),
+  tut('t35', 'Recovery After 50', 'Gyors recovery 50/50 után.', 'Mechanics', '8:20', 2, 5),
+  tut('t36', 'Backboard Defense', 'Backboard védések időzítése.', 'Defense', '13:10', 3, 5),
+  tut('t37', 'Air Roll Shot', 'Air roll lövés kontroll.', 'Aerial', '14:40', 4, 3),
 ];
 
 export const TUTORIAL_CATEGORIES = Array.from(new Set(TUTORIALS.map((t) => t.category)));

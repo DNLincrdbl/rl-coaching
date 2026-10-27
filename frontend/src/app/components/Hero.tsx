@@ -1,254 +1,242 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { motion, useMotionValue, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { IconType } from 'react-icons';
-import { FaPlay, FaChevronDown, FaArrowRight, FaGamepad, FaDumbbell } from 'react-icons/fa';
+import { useEffect, useRef, useState } from 'react';
+
+const StatementBall = dynamic(() => import('./StatementBall'), { ssr: false });
+
+const MARQUEE = ['Kurzusok', 'Aréna', 'Replay elemzés', 'Heti küldetések', 'Leaderboard', 'RLM+'];
+
+const STATEMENT = 'Légy erős és egészséges gamer. Kombináld a gaming szenvedélyt az egészséges életmóddal.';
 
 export default function Hero() {
-  const [currentVersion, setCurrentVersion] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const heroVersions: {
-    badge: string; badgeIcon: IconType; title: string; highlightText: string;
-    titleEnd: string; highlightColors: string; glowColor: string; description: string;
-    primaryButton: string; secondaryButton: string;
-  }[] = [
-    {
-      badge: "Professzionális Rocket League Coaching",
-      badgeIcon: FaGamepad,
-      title: "Emelkedj ki a",
-      highlightText: "játékosok",
-      titleEnd: "közül",
-      highlightColors: "from-orange-400 via-red-500 to-orange-400",
-      glowColor: "orange",
-      description: "Profi útmutatással és gyakorlati tippekkel segítek elérni a következő szintet a Rocket League-ben.",
-      primaryButton: "Kezdjük el",
-      secondaryButton: "Tudj meg többet"
-    },
-    {
-      badge: "Egészséges Gaming Lifestyle",
-      badgeIcon: FaDumbbell,
-      title: "Légy erős és",
-      highlightText: "egészséges",
-      titleEnd: "gamer",
-      highlightColors: "from-emerald-400 via-green-500 to-emerald-400",
-      glowColor: "green",
-      description: "Kombináld a gaming szenvedélyt az egészséges életmóddal. Építsd fel az erős tested, miközben fejlődsz a játékban.",
-      primaryButton: "Kezdjük el",
-      secondaryButton: "Tudj meg többet"
-    }
-  ];
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const videoY = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
+  const copyY = useTransform(scrollYProgress, [0, 1], ['0%', '10%']);
+  const copyOpacity = useTransform(scrollYProgress, [0, 0.72], [1, 0]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsVisible(false);
-      setTimeout(() => {
-        setCurrentVersion((prev) => (prev + 1) % heroVersions.length);
-        setIsVisible(true);
-      }, 500);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [heroVersions.length]);
-
-  const currentHero = heroVersions[currentVersion];
-  const isGaming = currentVersion === 0;
-
-  const BadgeIcon = currentHero.badgeIcon;
+    const video = videoRef.current;
+    const hero = heroRef.current;
+    if (!video || !hero) return;
+    video.muted = true;
+    video.preload = 'metadata';
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        const play = video.play();
+        if (play) play.catch(() => {});
+      } else {
+        video.pause();
+      }
+    }, { rootMargin: '120px' });
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Ambient brand glows on pure black */}
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.25, 0.4, 0.25] }}
-        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-        className={`absolute top-1/4 -left-40 w-[520px] h-[520px] rounded-full blur-[140px] ${
-          isGaming ? 'bg-orange-500/25' : 'bg-emerald-500/25'
-        } transition-colors duration-1000`}
-      />
-      <motion.div
-        animate={{ scale: [1, 1.25, 1], opacity: [0.15, 0.3, 0.15] }}
-        transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        className={`absolute bottom-1/4 -right-40 w-[600px] h-[600px] rounded-full blur-[160px] ${
-          isGaming ? 'bg-rose-500/20' : 'bg-green-500/20'
-        } transition-colors duration-1000`}
-      />
+    <div>
+      <section ref={heroRef} className="relative h-[100svh] min-h-[640px] overflow-hidden bg-black">
+        <motion.div style={{ y: videoY }} className="absolute -inset-x-0 -top-[8%] h-[120%]">
+          <video
+            ref={videoRef}
+            className="h-full w-full object-cover"
+            src="/fennec_hero_video.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden
+          />
+        </motion.div>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/25" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/75 via-black/15 to-transparent" />
 
-      <div className="container mx-auto px-4 relative z-10 pt-24">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-7xl mx-auto">
-
-          {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="text-left"
-          >
-            {/* Eyebrow badge */}
-            <motion.div
-              key={`badge-${currentVersion}`}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -16 }}
-              transition={{ duration: 0.5 }}
-              className="mb-8"
-            >
-              <span className={`rlm-eyebrow ${isGaming ? 'text-orange-300' : 'text-emerald-300'}`}>
-                <BadgeIcon className="w-3.5 h-3.5" />
-                {currentHero.badge}
-              </span>
-            </motion.div>
-
-            {/* Title */}
-            <motion.h1
-              key={`title-${currentVersion}`}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -16 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-[1.02] tracking-tight text-white"
-            >
-              {currentHero.title}{' '}
-              <span className={`bg-gradient-to-r ${currentHero.highlightColors} text-transparent bg-clip-text`}>
-                {currentHero.highlightText}
-              </span>{' '}
-              {currentHero.titleEnd}
-            </motion.h1>
-
-            {/* Description */}
+        <motion.div
+          style={{ y: copyY, opacity: copyOpacity }}
+          className="relative z-10 flex h-full flex-col justify-end px-4 pb-10 pt-28 md:px-8 md:pb-14"
+        >
+          <div className="mx-auto w-full max-w-6xl">
             <motion.p
-              key={`desc-${currentVersion}`}
               initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -16 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed"
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="mb-6 flex items-center text-[11px] font-medium uppercase tracking-[0.32em] text-white/75"
             >
-              {currentHero.description}
+              <span className="mr-3 inline-block h-1.5 w-1.5 rounded-full bg-[#FF6A2B]" />
+              Professzionális Rocket League Coaching
             </motion.p>
 
-            {/* Buttons */}
-            <motion.div
-              key={`buttons-${currentVersion}`}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : -16 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4"
+            <motion.h1
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.25 }}
+              className="max-w-5xl text-[clamp(3.3rem,9vw,8.25rem)] font-black leading-[0.86] tracking-[-0.045em] text-white"
             >
-              <Link href="#pricing">
-                <motion.button
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="rlm-btn-primary group px-8 py-4 text-base flex items-center gap-2"
-                >
-                  <FaPlay className="w-3 h-3" />
-                  {currentHero.primaryButton}
-                  <FaArrowRight className="w-3.5 h-3.5 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                </motion.button>
-              </Link>
-              <Link href="#about">
-                <motion.button
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 rlm-card !rounded-[0.9rem] text-base font-semibold text-white hover:border-white/25 transition-all"
-                >
-                  {currentHero.secondaryButton}
-                </motion.button>
-              </Link>
-            </motion.div>
+              Emelkedj ki
+              <br />
+              a <span className="text-stroke">játékosok</span>
+              <br />
+              közül.
+            </motion.h1>
 
-            {/* Stats */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="grid grid-cols-3 gap-4 mt-12 pt-8 border-t border-white/10 max-w-md"
+              transition={{ duration: 0.7, delay: 0.45 }}
+              className="mt-8 max-w-md lg:mt-10"
             >
-              {[
-                { v: 'SSL', l: 'Rang' },
-                { v: '10+', l: 'Év tapasztalat' },
-                { v: '500+', l: 'Elégedett tanuló' },
-              ].map((s) => (
-                <div key={s.l}>
-                  <p className="text-3xl font-black text-white">{s.v}</p>
-                  <p className="text-sm text-gray-500">{s.l}</p>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Right Content - Portrait */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.35 }}
-            className="relative hidden lg:flex items-center justify-center"
-          >
-            <motion.div
-              className={`absolute w-[420px] h-[420px] rounded-full blur-[110px] transition-colors duration-1000 ${
-                isGaming ? 'bg-orange-500/20' : 'bg-emerald-500/20'
-              }`}
-              animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            <div className="relative z-10 rlm-orb">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 34, repeat: Infinity, ease: 'linear' }}
-                className={`absolute -inset-8 rounded-full border border-dashed transition-colors duration-1000 ${
-                  isGaming ? 'border-orange-500/25' : 'border-emerald-500/25'
-                }`}
-              />
-              <div className="relative w-80 h-80 rounded-full overflow-hidden border border-white/15 shadow-2xl shadow-black/60">
-                <Image
-                  src="/zoli/zolypic.jpg"
-                  alt="JusTZoly"
-                  fill
-                  className="object-cover object-center scale-110"
-                  priority
-                />
-                <div className={`absolute inset-0 bg-gradient-to-t transition-colors duration-1000 ${
-                  isGaming ? 'from-orange-500/15 to-transparent' : 'from-emerald-500/15 to-transparent'
-                }`} />
+              <p className="text-base leading-relaxed text-white/70 md:text-lg">
+                Profi útmutatással és gyakorlati tippekkel segítek elérni a következő szintet a Rocket League-ben.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href="#pricing"
+                  className="inline-flex items-center rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition hover:bg-white/90"
+                >
+                  Kezdjük el
+                </Link>
+                <Link
+                  href="#about"
+                  className="inline-flex items-center rounded-full border border-white/30 px-7 py-3.5 text-sm font-semibold text-white transition hover:border-white/70"
+                >
+                  Tudj meg többet
+                </Link>
               </div>
-
-              {mounted && [...Array(6)].map((_, i) => {
-                const angle = (i * Math.PI * 2) / 6;
-                const radius = 200;
-                return (
-                  <motion.div
-                    key={i}
-                    className={`absolute w-1.5 h-1.5 rounded-full ${isGaming ? 'bg-orange-400' : 'bg-emerald-400'}`}
-                    style={{ left: '50%', top: '50%', x: Math.cos(angle) * radius - 3, y: Math.sin(angle) * radius - 3 }}
-                    animate={{ scale: [0.5, 1, 0.5], opacity: [0.3, 0.8, 0.3] }}
-                    transition={{ duration: 3, repeat: Infinity, delay: i * 0.5, ease: 'easeInOut' }}
-                  />
-                );
-              })}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="flex flex-col items-center gap-2 text-gray-500"
-          >
-            <span className="text-xs uppercase tracking-widest">Görgess</span>
-            <FaChevronDown className="w-4 h-4" />
-          </motion.div>
+            </motion.div>
+          </div>
         </motion.div>
+
+      </section>
+
+      <div className="overflow-hidden border-y border-white/10">
+        <div className="rlm-marquee-track flex w-max py-4">
+          {[0, 1].map((copy) => (
+            <div key={copy} className="flex items-center">
+              {MARQUEE.map((item) => (
+                <span
+                  key={`${copy}-${item}`}
+                  className="flex items-center px-5 text-[12px] font-medium uppercase tracking-[0.32em] text-white/70"
+                >
+                  {item}
+                  <span className="ml-8 text-[#FF6A2B]">·</span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
+
+      <Statement />
     </div>
+  );
+}
+
+function Statement() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const progress = useMotionValue(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const words = STATEMENT.split(' ');
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const applyReduced = () => setReduceMotion(media.matches);
+    applyReduced();
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const track = trackRef.current;
+      if (!track || media.matches) {
+        progress.set(1);
+        return;
+      }
+      const rect = track.getBoundingClientRect();
+      const view = window.innerHeight;
+      const distance = Math.max(1, track.offsetHeight - view);
+      const passed = Math.min(distance, Math.max(0, -rect.top));
+      progress.set(passed / distance);
+    };
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(update);
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    media.addEventListener('change', applyReduced);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      media.removeEventListener('change', applyReduced);
+    };
+  }, [progress]);
+
+  return (
+    <div ref={trackRef} className={reduceMotion ? 'bg-black' : 'relative h-[200vh] bg-black'}>
+      <section
+        className={
+          reduceMotion
+            ? 'rlm-glow rlm-glow-right relative overflow-hidden bg-black px-4 py-28 md:px-8 md:py-40'
+            : 'rlm-glow rlm-glow-right sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden bg-black px-4 md:px-8'
+        }
+      >
+        <StatementBall progress={progress} still={reduceMotion} />
+        <div className="relative z-10 mx-auto w-full max-w-6xl md:pr-64 lg:pr-72">
+          <p className="mb-8 text-[11px] font-medium uppercase tracking-[0.32em] text-white/40">
+            Egészséges gaming
+          </p>
+          <p className="flex max-w-5xl flex-wrap gap-x-[0.28em] text-[clamp(2.4rem,6.6vw,5.8rem)] font-black leading-[0.92] tracking-[-0.045em]">
+            {words.map((word, i) => (
+              <RevealWord
+                key={`${word}-${i}`}
+                word={word}
+                index={i}
+                total={words.length}
+                progress={progress}
+                lit={reduceMotion}
+              />
+            ))}
+          </p>
+          <p className="mt-10 max-w-xl text-base leading-relaxed text-white/50 md:text-lg">
+            Építsd fel az erős tested, miközben fejlődsz a játékban.
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function RevealWord({
+  word,
+  index,
+  total,
+  progress,
+  lit,
+}: {
+  word: string;
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+  lit: boolean;
+}) {
+  const revealEnd = 0.82;
+  const span = revealEnd / total;
+  const start = index * span;
+  const end = start + span;
+  const opacity = useTransform(progress, [start, end], [0.16, 1]);
+  return (
+    <motion.span style={lit ? undefined : { opacity }} className="text-white">
+      {word}
+    </motion.span>
   );
 }

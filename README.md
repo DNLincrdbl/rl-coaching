@@ -5,9 +5,22 @@ Monorepo:
 - **`frontend/`** — Next.js 16 (React 19, Tailwind v4) app, single fixed dark theme.
 - **`backend/`** — Flask (Python) API with SQLite, JWT auth in httpOnly cookies.
 
-## Futtatás
+## Helyi teszt szerver (Mac)
 
-### Backend (Flask)
+Egy parancs indítja a backendet (`:5001`) és a frontendet (`:3000`). Stripe nincs bekötve: a checkout a fiókra írja a csomagot, hogy minden funkció élesben, helyben menjen.
+
+```bash
+chmod +x dev.sh
+./dev.sh          # elindítja mindkét szervert (elsőre seedeli az adatbázist)
+./dev.sh --seed   # drop + új demo adatok, majd start
+```
+
+Böngésző: [http://localhost:3000](http://localhost:3000)
+
+A seedelt demo belépési adatok a `seed.py` futtatása után a terminálban jelennek meg
+(és a `backend/.env` / `ADMIN_*` változókból jönnek). **Ne commitold** a jelszavakat dokumentációba.
+
+Kézi indítás, ha külön terminált akarsz:
 
 ```bash
 cd backend
@@ -15,14 +28,9 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env          # majd írd át a titkokat
-python seed.py                # adatbázis + lokális demo userek
+python seed.py
 python run.py                 # http://127.0.0.1:5001
 ```
-
-A seedelt demo belépési adatok a `seed.py` futtatása után a terminálban jelennek meg
-(és a `backend/.env` / `ADMIN_*` változókból jönnek). **Ne commitold** a jelszavakat dokumentációba.
-
-### Frontend (Next.js)
 
 ```bash
 cd frontend

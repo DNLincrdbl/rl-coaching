@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import {
@@ -13,16 +13,19 @@ import {
   FaStar,
   FaTimes,
   FaLayerGroup,
+  FaLock,
+  FaTrophy,
 } from 'react-icons/fa';
 import { useRLM } from '@/contexts/RLMContext';
 import {
-  COURSES,
+  COURSES as FALLBACK_COURSES,
+  TUTORIALS as FALLBACK_TUTORIALS,
+  TUTORIAL_CATEGORIES as FALLBACK_CATS,
   Course,
   Lesson,
-  TUTORIALS,
   Tutorial,
-  TUTORIAL_CATEGORIES,
 } from '@/lib/data/learn';
+import { api } from '@/lib/api';
 
 type Section = 'courses' | 'tutorials';
 
@@ -73,7 +76,9 @@ function CourseDetail({ course, progress, onBack, onWatch }: {
   onBack: () => void;
   onWatch: (lesson: Lesson, index: number) => void;
 }) {
-  const completedLessons = Math.floor((progress / 100) * course.lessons.length);
+  const completedLessons = Math.round((progress / 100) * course.lessons.length);
+  const introWatched = progress > 0;
+  const [lockedHint, setLockedHint] = useState(false);
   return (
     <div className="space-y-6 rlm-fade-up">
       <button onClick={onBack} className="text-gray-400 hover:text-white flex items-center gap-2">
@@ -86,6 +91,9 @@ function CourseDetail({ course, progress, onBack, onWatch }: {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-6">
+          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wide text-orange-300 bg-orange-500/20 border border-orange-500/30 rounded-full px-2 py-0.5 mb-2">
+            <FaTrophy className="w-2.5 h-2.5" /> {course.rankRange}
+          </span>
           <h1 className="text-3xl font-bold text-white mb-2">{course.title}</h1>
           <p className="text-gray-300 mb-4">{course.description}</p>
           <div className="max-w-md">
@@ -94,7 +102,7 @@ function CourseDetail({ course, progress, onBack, onWatch }: {
               <span className="text-orange-400 font-medium">{progress}%</span>
             </div>
             <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-orange-500 to-red-500" style={{ width: `${progress}%` }} />
+              <div className="h-full bg-white" style={{ width: `${progress}%` }} />
             </div>
           </div>
         </div>
@@ -103,25 +111,37 @@ function CourseDetail({ course, progress, onBack, onWatch }: {
       <div className="rlm-card overflow-hidden">
         <div className="p-4 border-b border-white/10">
           <h2 className="text-lg font-bold text-white">Videók</h2>
+          <p className="text-xs text-gray-500 mt-1">A bemutatót először meg kell nézni, utána nyílnak a leckék.</p>
+          {lockedHint && (
+            <p className="text-sm text-orange-300 mt-2" role="alert">Előbb nézd meg a kurzus bemutatót.</p>
+          )}
         </div>
         <div className="divide-y divide-white/5">
           {course.lessons.map((lesson, index) => {
             const isCompleted = index < completedLessons;
+            const locked = !lesson.isIntro && !introWatched;
             return (
               <button
                 key={lesson.id}
-                onClick={() => onWatch(lesson, index)}
-                className="w-full p-4 flex items-center gap-4 text-left hover:bg-white/5 transition-colors"
+                onClick={() => {
+                  if (locked) {
+                    setLockedHint(true);
+                    return;
+                  }
+                  onWatch(lesson, index);
+                }}
+                className={`w-full p-4 flex items-center gap-4 text-left transition-colors ${locked ? 'opacity-50' : 'hover:bg-white/5'}`}
               >
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  isCompleted ? 'bg-green-500' : lesson.isIntro ? 'bg-blue-500' : 'bg-white/10'
+                  isCompleted ? 'bg-green-500' : lesson.isIntro ? 'bg-blue-500' : locked ? 'bg-white/5' : 'bg-white/10'
                 }`}>
-                  {isCompleted ? <FaCheck className="w-4 h-4 text-white" /> : <FaPlay className="w-4 h-4 text-white ml-0.5" />}
+                  {locked ? <FaLock className="w-4 h-4 text-gray-400" /> : isCompleted ? <FaCheck className="w-4 h-4 text-white" /> : <FaPlay className="w-4 h-4 text-white ml-0.5" />}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-white flex items-center gap-2">
                     {lesson.title}
                     {lesson.isIntro && <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300">Bemutató</span>}
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-400">{course.rankRange}</span>
                   </h3>
                   <span className="text-sm text-gray-500">{lesson.duration}</span>
                 </div>
@@ -143,9 +163,22 @@ export default function LearnPage() {
   // Tutorials filters
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | null>(null);
+  const [courses, setCourses] = useState<Course[]>(FALLBACK_COURSES);
+  const [tutorials, setTutorials] = useState<Tutorial[]>(FALLBACK_TUTORIALS);
+  const [tutorialCategories, setTutorialCategories] = useState<string[]>(FALLBACK_CATS);
+
+  useEffect(() => {
+    void api.get<{ courses: Course[]; tutorials: Tutorial[]; tutorialCategories: string[] }>('/api/learn')
+      .then((res) => {
+        if (res.courses?.length) setCourses(res.courses);
+        if (res.tutorials?.length) setTutorials(res.tutorials);
+        if (res.tutorialCategories?.length) setTutorialCategories(res.tutorialCategories);
+      })
+      .catch(() => { /* keep bundled fallback */ });
+  }, []);
 
   const filteredTutorials = useMemo(() => {
-    return TUTORIALS.filter((t) => {
+    return tutorials.filter((t) => {
       const matchesSearch =
         search === '' ||
         t.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -153,7 +186,7 @@ export default function LearnPage() {
       const matchesCat = !category || t.category === category;
       return matchesSearch && matchesCat;
     });
-  }, [search, category]);
+  }, [search, category, tutorials]);
 
   const getCourseProgress = (id: string) => profile.courseProgress.find((c) => c.courseId === id)?.progress || 0;
 
@@ -207,7 +240,7 @@ export default function LearnPage() {
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {COURSES.map((course, i) => {
+            {courses.map((course, i) => {
               const progress = getCourseProgress(course.id);
               return (
                 <motion.div
@@ -224,12 +257,13 @@ export default function LearnPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                     {progress > 0 && (
                       <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-                        <div className="h-full bg-gradient-to-r from-orange-500 to-red-500" style={{ width: `${progress}%` }} />
+                        <div className="h-full bg-white" style={{ width: `${progress}%` }} />
                       </div>
                     )}
                   </div>
                   <div className="p-5">
                     <h3 className="text-lg font-bold text-white mb-2">{course.title}</h3>
+                    <p className="text-xs text-orange-300/80 mb-2">{course.rankRange}</p>
                     <p className="text-sm text-gray-400 mb-4 line-clamp-2">{course.description}</p>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-500">{course.lessons.length} videó</span>
@@ -263,7 +297,7 @@ export default function LearnPage() {
             >
               Mind
             </button>
-            {TUTORIAL_CATEGORIES.map((cat) => (
+            {tutorialCategories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(category === cat ? null : cat)}
@@ -289,8 +323,8 @@ export default function LearnPage() {
                   className="rlm-card rlm-card-hover overflow-hidden cursor-pointer group"
                 >
                   <div className="aspect-video bg-gradient-to-br from-white/5 to-white/10 relative flex items-center justify-center">
-                    <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <FaPlay className="w-5 h-5 text-white ml-0.5" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white opacity-0 transition-opacity group-hover:opacity-100">
+                      <FaPlay className="ml-0.5 h-4 w-4 text-black" />
                     </div>
                     <span className="absolute bottom-2 right-2 bg-black/70 px-2 py-0.5 rounded text-xs text-white">{t.duration}</span>
                     <span className="absolute top-2 left-2 bg-black/60 px-2 py-0.5 rounded text-[10px] text-gray-300">{t.category}</span>

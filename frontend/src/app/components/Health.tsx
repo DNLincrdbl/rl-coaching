@@ -5,93 +5,47 @@ import BeforeAfterSlider from './BeforeAfterSlider';
 
 export default function Health() {
   return (
-    <section id="health" className="py-32 relative">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
-          className="absolute top-1/3 -left-40 w-[500px] h-[500px] bg-green-500/10 rounded-full blur-[150px]"
-          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-1/3 -right-40 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[120px]"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.12, 0.08] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-      </div>
-      
-      {/* Grid Pattern */}
-      <div 
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-          backgroundSize: '50px 50px'
-        }}
-      />
-
-      <div className="container mx-auto px-4 relative z-10">
+    <section id="health" className="pt-24 md:pt-40">
+      <div className="grid lg:grid-cols-2">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto"
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col justify-end px-4 py-16 md:px-10 lg:py-24 lg:pl-16"
         >
-          <div className="text-center mb-16">
-            <motion.span
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-green-500/10 border border-green-500/20 text-green-400 backdrop-blur-sm"
-            >
-              💪 Egészséges életmód
-            </motion.span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-6 text-white">
-              A Játék és Az{' '}
-              <span className="bg-gradient-to-r from-green-400 to-emerald-400 text-transparent bg-clip-text">
-                Egészség
-              </span>
-            </h2>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left - Story */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <p className="text-gray-400 leading-relaxed text-xl">
-                Egészségesebb légkörré próbálom tenni a gaminget, azzal hogy segítek átvenni az irányítást nem csak a játék, hanem az egészség felett.
-              </p>
-              
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                  <p className="text-2xl font-bold text-green-400">50+</p>
-                  <p className="text-sm text-gray-500">Gyakorlat</p>
-                </div>
-                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                  <p className="text-2xl font-bold text-green-400">100%</p>
-                  <p className="text-sm text-gray-500">Otthon végezhető</p>
-                </div>
-              </div>
-            </motion.div>
-            
-            {/* Right - Before/After Image */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="relative aspect-[4/3] w-full h-full rounded-2xl overflow-hidden border border-white/10">
-                <BeforeAfterSlider />
-              </div>
-            </motion.div>
-          </div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-white/40">Egészséges életmód</p>
+          <h2 className="mt-4 text-[clamp(3.4rem,7vw,6.4rem)] font-black leading-[0.86] tracking-[-0.05em] text-white">
+            A játék
+            <br />
+            és az <span className="text-stroke">egészség.</span>
+          </h2>
+          <p className="mt-8 max-w-md text-lg leading-relaxed text-white/60">
+            Egészségesebb légkörré próbálom tenni a gaminget, azzal hogy segítek átvenni az irányítást nem csak a játék, hanem az egészség felett.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.7 }}
+          className="relative h-[70vh] lg:h-screen"
+        >
+          <BeforeAfterSlider />
         </motion.div>
       </div>
+
+      <dl className="grid grid-cols-2 border-t border-white/15">
+        <div className="border-r border-white/15 px-4 py-8 md:px-10 md:py-12">
+          <dt className="text-[11px] uppercase tracking-[0.28em] text-white/40">Gyakorlat</dt>
+          <dd className="mt-2 text-[clamp(3.5rem,8vw,7rem)] font-black leading-none tracking-[-0.05em] text-white">50+</dd>
+        </div>
+        <div className="px-4 py-8 md:px-10 md:py-12">
+          <dt className="text-[11px] uppercase tracking-[0.28em] text-white/40">Otthon végezhető</dt>
+          <dd className="mt-2 text-[clamp(3.5rem,8vw,7rem)] font-black leading-none tracking-[-0.05em] text-white">100%</dd>
+        </div>
+      </dl>
     </section>
   );
 }

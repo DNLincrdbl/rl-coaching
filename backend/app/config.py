@@ -70,3 +70,24 @@ class Config:
     ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "zoli@rlm.hu")
     ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Admin1234!")
     ADMIN_NAME = os.environ.get("ADMIN_NAME", "JusTZoly")
+
+    FLASK_ENV = os.environ.get("FLASK_ENV", "development")
+
+    # --- Email (optional). Without MAIL_HOST, development letters are saved to MAIL_OUTBOX. ---
+    MAIL_HOST = os.environ.get("MAIL_HOST", "").strip()
+    MAIL_PORT = int(os.environ.get("MAIL_PORT", "587") or 587)
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "").strip()
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+    MAIL_FROM = os.environ.get("MAIL_FROM", os.environ.get("MAIL_USERNAME", "")).strip()
+    MAIL_USE_TLS = _bool(os.environ.get("MAIL_USE_TLS"), True)
+    MAIL_USE_SSL = _bool(os.environ.get("MAIL_USE_SSL"), False)
+    _outbox = os.environ.get("MAIL_OUTBOX", os.path.join(BASE_DIR, "mail_outbox"))
+    MAIL_OUTBOX = _outbox if os.path.isabs(_outbox) else os.path.join(BASE_DIR, _outbox)
+
+    # Discord OAuth (optional). Without CLIENT_ID, users type the Discord name by hand.
+    DISCORD_CLIENT_ID = os.environ.get("DISCORD_CLIENT_ID", "").strip()
+    DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET", "").strip()
+    DISCORD_REDIRECT_URI = os.environ.get(
+        "DISCORD_REDIRECT_URI",
+        "http://127.0.0.1:5001/api/auth/discord/callback",
+    ).strip()

@@ -1,612 +1,402 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
-  FaUser,
-  FaStar,
-  FaTrophy,
-  FaCheckCircle,
+  FaGraduationCap,
   FaProjectDiagram,
-  FaPen,
   FaVideo,
-  FaChevronRight,
-  FaGlobe,
   FaCrown,
-  FaTimes,
-  FaDiscord,
-  FaPlus,
-  FaComments,
+  FaChevronRight,
+  FaBolt,
+  FaCheck,
+  FaLock,
+  FaUpload,
+  FaSearch,
+  FaUsers,
 } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useRLM,
   getXPProgressInLevel,
-  RL_RANKS,
-  PROFILE_BADGES,
+  isRlmPlus,
+  EXTRA_REPLAY_PRICE,
 } from '@/contexts/RLMContext';
-import {
-  CoachingSheet,
-  RATING_TOPICS,
-  RATING_COLOR_META,
-  ratingColorFor,
-  sheetScore,
-} from '@/lib/data/coaching';
-import { ARENA_TREES } from '@/lib/data/arena';
+import { COURSES as FALLBACK_COURSES, TUTORIALS as FALLBACK_TUTORIALS, Course } from '@/lib/data/learn';
+import { MONTHLY_ARENA_NODES } from '@/lib/data/arena';
+import { RATING_TOPICS, RATING_COLOR_META, ratingColorFor, sheetScore } from '@/lib/data/coaching';
+import { api, resolveVideoUrl } from '@/lib/api';
 
-function StatCard({ icon: Icon, label, value, color }: { icon: React.ElementType; label: string; value: string | number; color: string }) {
-  return (
-    <motion.div whileHover={{ scale: 1.02 }} className="rlm-card rlm-card-hover p-5">
-      <div className="flex items-center gap-4">
-        <div className={`${color} p-3 rounded-xl`}>
-          <Icon className="w-6 h-6 text-white" />
-        </div>
-        <div>
-          <p className="text-sm text-gray-400">{label}</p>
-          <p className="text-2xl font-bold text-white">{value}</p>
-        </div>
-      </div>
-    </motion.div>
-  );
+interface WeeklyChallenge {
+  id: string;
+  title: string;
+  xp: number;
+  credit: number;
+  done: boolean;
 }
 
-/** Row of 5 colored rating dots summarizing a sheet. */
-function RatingDots({ sheet }: { sheet: CoachingSheet }) {
+interface WeeklyResponse {
+  resetsAt: string;
+  completed: number;
+  total: number;
+  challenges: WeeklyChallenge[];
+}
+
+interface LbRow {
+  id: number;
+  position: number;
+  name: string;
+  rank: string | null;
+  score: number;
+}
+
+function relativeTime(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.max(0, Math.floor(diff / 60000));
+  if (mins < 60) return `${mins} perce`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} órája`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'tegnap';
+  return `${days} napja`;
+}
+
+export default function DashboardHome() {
+  const { user } = useAuth();
+  const { profile } = useRLM();
+  const xp = getXPProgressInLevel(profile.xp);
+  const plus = isRlmPlus(profile.subscriptionTier);
+  const name = user?.displayName || 'játékos';
+  const sheets = profile.coachingSheets;
+  const latest = sheets[0];
+  const arenaDone = (profile.arenaProgress.dribble?.length || 0) + (profile.arenaProgress.aerial?.length || 0);
+  const coursesDone = profile.courseProgress.filter((c) => c.progress > 0).length;
+  const pendingSubs = profile.submissions.filter((s) => s.status === 'pending').length;
+
+  const [courses, setCourses] = useState<Course[]>(FALLBACK_COURSES);
+  const [tutorialCount, setTutorialCount] = useState(FALLBACK_TUTORIALS.length);
+  const [weekly, setWeekly] = useState<WeeklyResponse | null>(null);
+  const [board, setBoard] = useState<{ top: LbRow[]; me: LbRow | null; unlocked: boolean } | null>(null);
+
+  useEffect(() => {
+    void api.get<{ courses: Course[]; tutorials: { id: string }[] }>('/api/learn')
+      .then((res) => {
+        if (res.courses?.length) setCourses(res.courses);
+        if (res.tutorials?.length) setTutorialCount(res.tutorials.length);
+      })
+      .catch(() => {});
+    void api.get<WeeklyResponse>('/api/weekly').then(setWeekly).catch(() => {});
+    void api.get<{ top: LbRow[]; me: LbRow | null; unlocked: boolean }>('/api/leaderboard')
+      .then((res) => setBoard({ top: (res.top || []).slice(0, 3), me: res.me, unlocked: Boolean(res.unlocked) }))
+      .catch(() => {});
+  }, []);
+
+  const featured = useMemo(() => courses.slice(0, 3), [courses]);
+  const weeklyLeft = weekly ? Math.max(0, weekly.total - weekly.completed) : 0;
+  const resetDays = weekly?.resetsAt
+    ? Math.max(0, Math.ceil((new Date(weekly.resetsAt).getTime() - Date.now()) / 86400000))
+    : null;
+
+  const shortcuts = [
+    {
+      href: '/dashboard/learn',
+      icon: FaGraduationCap,
+      label: 'Kurzusok',
+      hint: 'Fejleszd a tudásod',
+      meta: `${tutorialCount} tutoriál`,
+    },
+    {
+      href: '/dashboard/arena',
+      icon: FaProjectDiagram,
+      label: 'Aréna',
+      hint: 'Építsd a skill fádat',
+      meta: `${arenaDone}/${MONTHLY_ARENA_NODES} node`,
+    },
+    {
+      href: '/dashboard/profile#elemzesek',
+      icon: FaVideo,
+      label: 'Replay elemzés',
+      hint: 'Elemzéseid a profilodon',
+      meta: sheets.length ? `${sheets.length} sheet` : 'Még nincs sheet',
+    },
+    {
+      href: '/dashboard/profile?book=1',
+      icon: FaCrown,
+      label: 'Coaching',
+      hint: 'Replay beküldése Zolinak',
+      meta: plus ? `${profile.coachingCredits + profile.extraReplayCredits} kredit` : 'RLM+',
+    },
+  ];
+
   return (
-    <div className="flex items-center gap-3">
-      {RATING_TOPICS.map((topic) => {
-        const color = ratingColorFor(sheet, topic.id);
-        return (
-          <div key={topic.id} className="flex flex-col items-center gap-1" title={`${topic.label}: ${RATING_COLOR_META[color].label}`}>
-            <span className={`w-3.5 h-3.5 rounded-full ${RATING_COLOR_META[color].css}`} />
-            <span className="text-[10px] text-gray-500 hidden sm:block">{topic.short}</span>
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_20rem] gap-5">
+        <div className="space-y-5">
+          <section>
+            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/40">Kezdőlap</p>
+            <h1 className="mt-3 max-w-4xl">
+              Üdv újra, {name}.
+            </h1>
+            <p className="mt-4 max-w-xl text-white/50">Kurzusok, aréna, heti küldetések és replay elemzés egy helyen.</p>
+            <div className="mt-8 max-w-md">
+              <div className="mb-2 flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-white/40">
+                <span>Szint {profile.level}</span>
+                <span>{xp.current} / {xp.required} XP</span>
+              </div>
+              <div className="h-px overflow-hidden bg-white/15">
+                <div
+                  className="h-full bg-white"
+                  style={{ width: `${Math.min(100, (xp.current / xp.required) * 100)}%` }}
+                />
+              </div>
+            </div>
+          </section>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {shortcuts.map((s) => (
+              <Link key={s.href} href={s.href} className="rlm-card rlm-card-hover p-4 block">
+                <s.icon className="mb-4 h-4 w-4 text-white/70" />
+                <p className="text-[11px] uppercase tracking-[0.22em] text-white/35">{s.label}</p>
+                <p className="mt-1 text-lg font-semibold tracking-[-0.03em] text-white">{s.hint}</p>
+                <p className="mt-3 flex items-center gap-1 text-xs text-white/45">
+                  {s.meta} <FaChevronRight className="w-2.5 h-2.5" />
+                </p>
+              </Link>
+            ))}
           </div>
-        );
-      })}
-    </div>
-  );
-}
 
-function SheetCard({ sheet, featured = false }: { sheet: CoachingSheet; featured?: boolean }) {
-  return (
-    <Link href={`/dashboard/sheet/${sheet.id}`}>
-      <motion.div
-        whileHover={{ scale: 1.01 }}
-        className={`rlm-card rlm-card-hover p-5 h-full ${featured ? 'border-orange-500/20' : ''}`}
-      >
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div>
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <FaVideo className="w-4 h-4 text-orange-400" />
-              <h3 className="font-semibold text-white">{sheet.title}</h3>
-              {sheet.published && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-400 bg-green-500/15 border border-green-500/30 rounded-full px-2 py-0.5">
-                  <FaGlobe className="w-2.5 h-2.5" /> Publikálva
-                </span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="rlm-card p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-bold text-white flex items-center gap-2">
+                  <FaVideo className="text-orange-400" /> Legutóbbi replay elemzés
+                </h2>
+                <Link href="/dashboard/profile#elemzesek" className="text-xs text-white/45 hover:text-white">Összes</Link>
+              </div>
+              {latest ? (
+                <Link href={`/dashboard/sheet/${latest.id}`} className="block group">
+                  {latest.videoUrl ? (
+                    <div className="relative aspect-video rounded-xl overflow-hidden bg-black mb-3">
+                      <video src={resolveVideoUrl(latest.videoUrl)} className="w-full h-full object-cover" muted />
+                    </div>
+                  ) : null}
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-white font-semibold group-hover:text-orange-300">{latest.title}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{new Date(latest.createdAt).toLocaleString('hu-HU')}</p>
+                    </div>
+                    <span className="text-lg font-bold rlm-gradient-text">{sheetScore(latest)}</span>
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    {RATING_TOPICS.map((t) => (
+                      <span key={t.id} className={`w-2.5 h-2.5 rounded-full ${RATING_COLOR_META[ratingColorFor(latest, t.id)].css}`} title={t.label} />
+                    ))}
+                  </div>
+                </Link>
+              ) : (
+                <p className="text-sm text-gray-500">Még nincs replay elemzésed. A coaching után itt jelenik meg.</p>
               )}
             </div>
-            <p className="text-xs text-gray-500">{new Date(sheet.createdAt).toLocaleDateString('hu-HU')}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold rlm-gradient-text">{sheetScore(sheet)}</p>
-            <p className="text-[10px] text-gray-500 uppercase">Pont</p>
-          </div>
-        </div>
-        <p className="text-sm text-gray-400 mb-4 line-clamp-2">{sheet.summary}</p>
-        <div className="flex items-center justify-between">
-          <RatingDots sheet={sheet} />
-          <FaChevronRight className="w-4 h-4 text-gray-500" />
-        </div>
-      </motion.div>
-    </Link>
-  );
-}
 
-function RankEditModal({ current, onSelect, onClose }: { current: string | null; onSelect: (r: string) => void; onClose: () => void }) {
-  const [sel, setSel] = useState<string | null>(current);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [onClose]);
-
-  if (!mounted) return null;
-
-  return createPortal(
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
-    >
-      <motion.div
-        initial={{ scale: 0.96, opacity: 0, y: 12 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rlm-scroll rounded-2xl border border-white/10 bg-[#0A0A0C] p-6 shadow-2xl shadow-black/80"
-      >
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-xl font-bold text-white">Rang beállítása</h3>
-          <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-white/10"><FaTimes className="text-gray-400" /></button>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-6">
-          {RL_RANKS.map((rank) => (
-            <button
-              key={rank}
-              type="button"
-              onClick={() => setSel(rank)}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                sel === rank ? 'rlm-btn-primary' : 'bg-white/5 text-gray-300 hover:bg-white/10'
-              }`}
-            >
-              {rank}
-            </button>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={() => sel && onSelect(sel)}
-          disabled={!sel}
-          className="w-full rlm-btn-primary py-3 disabled:opacity-40"
-        >
-          Mentés
-        </button>
-      </motion.div>
-    </motion.div>,
-    document.body,
-  );
-}
-
-const MAX_UPLOAD_MB = 200;
-const ACCEPTED_VIDEO = ['mp4', 'webm', 'mov', 'm4v', 'ogg', 'ogv'];
-
-function BookingModal({ onConfirm, onClose, busy = false }: {
-  onConfirm: (payload: { video: File; note: string; useDiscord: boolean }) => void;
-  onClose: () => void;
-  busy?: boolean;
-}) {
-  const [useDiscord, setUseDiscord] = useState(true);
-  const [video, setVideo] = useState<File | null>(null);
-  const [note, setNote] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !busy) onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [onClose, busy]);
-
-  const pickFile = (file: File | null | undefined) => {
-    setError(null);
-    if (!file) return;
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-    if (!ACCEPTED_VIDEO.includes(ext)) {
-      setError('Nem támogatott formátum. Használj mp4, webm vagy mov fájlt.');
-      return;
-    }
-    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
-      setError(`A videó túl nagy (max ${MAX_UPLOAD_MB} MB).`);
-      return;
-    }
-    setVideo(file);
-  };
-
-  const submit = () => {
-    if (!video) {
-      setError('Tölts fel egy replay videót.');
-      return;
-    }
-    onConfirm({ video, note: note.trim(), useDiscord });
-  };
-
-  if (!mounted) return null;
-
-  return createPortal(
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={() => { if (!busy) onClose(); }}
-      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
-    >
-      <motion.div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="booking-modal-title"
-        initial={{ scale: 0.96, opacity: 0, y: 12 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.96, opacity: 0, y: 12 }}
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rlm-scroll rounded-2xl border border-white/10 bg-[#0A0A0C] p-6 shadow-2xl shadow-black/80"
-      >
-        <div className="flex items-center justify-between mb-5">
-          <h3 id="booking-modal-title" className="text-xl font-bold text-white">Replay beküldése</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={busy}
-            className="p-2 rounded-lg hover:bg-white/10 disabled:opacity-40"
-            aria-label="Bezárás"
-          >
-            <FaTimes className="text-gray-400" />
-          </button>
-        </div>
-
-        {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20" role="alert">
-            <p className="text-red-400 text-sm">{error}</p>
-          </div>
-        )}
-
-        <label className="block text-sm text-gray-400 mb-1.5">Replay videó</label>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,.m4v,.ogg,.ogv"
-          className="hidden"
-          onChange={(e) => pickFile(e.target.files?.[0])}
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => { e.preventDefault(); pickFile(e.dataTransfer.files?.[0]); }}
-          disabled={busy}
-          className={`w-full mb-4 rounded-xl border-2 border-dashed px-4 py-6 text-center transition-colors disabled:opacity-50 ${
-            video ? 'border-orange-500/50 bg-orange-500/10' : 'border-white/15 bg-white/[0.04] hover:border-white/30'
-          }`}
-        >
-          {video ? (
-            <div className="flex flex-col items-center gap-1">
-              <FaVideo className="w-6 h-6 text-orange-400" />
-              <span className="text-white text-sm font-medium break-all">{video.name}</span>
-              <span className="text-xs text-gray-500">{(video.size / (1024 * 1024)).toFixed(1)} MB · kattints a cseréhez</span>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-1">
-              <FaVideo className="w-6 h-6 text-gray-400" />
-              <span className="text-white text-sm font-medium">Húzd ide vagy válaszd ki a videót</span>
-              <span className="text-xs text-gray-500">mp4, webm, mov · max {MAX_UPLOAD_MB} MB</span>
-            </div>
-          )}
-        </button>
-
-        <label className="block text-sm text-gray-400 mb-1.5">Megjegyzés (opcionális)</label>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={2}
-          placeholder="Mire fókuszáljon a coach?"
-          disabled={busy}
-          className="w-full mb-4 bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500/50 disabled:opacity-50"
-        />
-
-        <p className="text-gray-400 text-sm mb-2">Szeretnél a coaching alatt Discordon beszélni is?</p>
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <button
-            type="button"
-            onClick={() => setUseDiscord(true)}
-            disabled={busy}
-            className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 disabled:opacity-50 ${
-              useDiscord ? 'border-orange-500 bg-orange-500/10' : 'border-white/10 bg-white/[0.04]'
-            }`}
-          >
-            <FaDiscord className="w-6 h-6 text-indigo-400" />
-            <span className="text-white text-xs font-medium">Igen, beszéljünk</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setUseDiscord(false)}
-            disabled={busy}
-            className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 disabled:opacity-50 ${
-              !useDiscord ? 'border-orange-500 bg-orange-500/10' : 'border-white/10 bg-white/[0.04]'
-            }`}
-          >
-            <FaComments className="w-6 h-6 text-gray-400" />
-            <span className="text-white text-xs font-medium">Nem, csak elemzés</span>
-          </button>
-        </div>
-
-        <button
-          type="button"
-          onClick={submit}
-          disabled={busy}
-          className="w-full rlm-btn-primary py-3 disabled:opacity-40"
-        >
-          {busy ? 'Feltöltés...' : 'Beküldés (1 kredit)'}
-        </button>
-      </motion.div>
-    </motion.div>,
-    document.body,
-  );
-}
-
-function CoachingCard() {
-  const { profile, submitReplay, purchaseExtraReplay } = useRLM();
-  const [showBooking, setShowBooking] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const isPro = profile.subscriptionTier === 'pro';
-  const canBook = profile.coachingCredits + profile.extraReplayCredits > 0;
-
-  const handleSubmit = async (payload: { video: File; note: string; useDiscord: boolean }) => {
-    setBusy(true);
-    try {
-      await submitReplay(payload);
-      setShowBooking(false);
-    } catch (e) {
-      alert(e instanceof Error ? e.message : 'Hiba a beküldéskor.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="rlm-card p-6">
-      <AnimatePresence>
-        {showBooking && (
-          <BookingModal onClose={() => setShowBooking(false)} onConfirm={handleSubmit} busy={busy} />
-        )}
-      </AnimatePresence>
-
-      <h2 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-        <FaCrown className="text-yellow-400" /> Coaching & Replay Elemzés
-      </h2>
-      <p className="text-sm text-gray-400 mb-5">
-        {isPro
-          ? 'PRO tagként havonta 1 coaching + replay elemzés jár. Igény szerint extra elemzést is vehetsz.'
-          : 'Az Alap tagság nem tartalmaz coachingot. Válts PRO-ra a coachingért.'}
-      </p>
-
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="rlm-card p-4 text-center">
-          <p className="text-3xl font-bold rlm-gradient-text">{profile.coachingCredits}</p>
-          <p className="text-xs text-gray-500 mt-1">Coaching kredit</p>
-        </div>
-        <div className="rlm-card p-4 text-center">
-          <p className="text-3xl font-bold rlm-gradient-text">{profile.extraReplayCredits}</p>
-          <p className="text-xs text-gray-500 mt-1">Extra replay</p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <button
-          onClick={() => setShowBooking(true)}
-          disabled={!canBook || busy}
-          className="rlm-btn-primary py-2.5 text-sm disabled:opacity-40"
-        >
-          Replay beküldése elemzésre
-        </button>
-        {isPro && (
-          <button
-            onClick={() => purchaseExtraReplay()}
-            className="py-2.5 text-sm rounded-xl bg-white/5 border border-white/10 text-gray-200 hover:bg-white/10 flex items-center justify-center gap-1.5"
-          >
-            <FaPlus className="w-3 h-3" /> Extra replay (4.990 Ft)
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  const { user } = useAuth();
-  const { profile, setRank, selectBadge } = useRLM();
-  const [showRankModal, setShowRankModal] = useState(false);
-  const xpProgress = getXPProgressInLevel(profile.xp);
-
-  const sheets = profile.coachingSheets;
-  const latestSheet = sheets[0];
-  const pastSheets = sheets.slice(1);
-
-  const totalArenaNodes = ARENA_TREES.dribble.nodes.length + ARENA_TREES.aerial.nodes.length;
-  const completedArenaNodes = profile.arenaProgress.dribble.length + profile.arenaProgress.aerial.length;
-
-  const selectedBadge = PROFILE_BADGES.find((b) => b.id === profile.selectedBadge);
-
-  return (
-    <div className="space-y-8 rlm-fade-up">
-      {/* Rank edit modal */}
-      <AnimatePresence>
-        {showRankModal && (
-          <RankEditModal
-            current={profile.rank}
-            onSelect={(r) => { setRank(r); setShowRankModal(false); }}
-            onClose={() => setShowRankModal(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Profile Header with Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative rounded-3xl overflow-hidden border border-white/10"
-      >
-        <div className="h-40 relative bg-[#0A0A0C] overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_-20%,rgba(255,106,43,0.35),transparent_45%),radial-gradient(circle_at_80%_120%,rgba(255,45,85,0.25),transparent_50%)]" />
-          <div className="absolute inset-0 opacity-[0.15] bg-[linear-gradient(to_right,rgba(255,255,255,0.4)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.4)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(circle_at_50%_0%,black,transparent_75%)]" />
-        </div>
-
-        <div className="bg-[#0A0A0C] p-6 pt-16 relative">
-          {/* Avatar */}
-          <div className="absolute -top-12 left-6">
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#1a1a1f] to-[#0a0a0c] border border-white/10 flex items-center justify-center overflow-hidden">
-              {selectedBadge ? <selectedBadge.icon className="w-10 h-10 text-orange-400" /> : <FaUser className="w-10 h-10 text-white" />}
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div className="ml-0 sm:ml-32">
-              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                {user?.displayName || 'Felhasználó'}
-                {selectedBadge && <selectedBadge.icon className="w-4 h-4 text-orange-400" title={selectedBadge.name} />}
-              </h1>
-              <button
-                onClick={() => setShowRankModal(true)}
-                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 text-sm mt-1"
-              >
-                {profile.rank || 'Nincs rang beállítva'}
-                <FaPen className="w-3 h-3" />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                profile.subscriptionTier === 'pro'
-                  ? 'bg-orange-500/15 text-orange-300 border-orange-500/30'
-                  : 'bg-white/5 text-gray-300 border-white/10'
-              }`}>
-                {profile.subscriptionTier === 'pro' ? 'PRO tagság' : 'Alap tagság'}
-              </span>
-              <div className="text-right">
-                <p className="text-sm text-gray-400">Szint</p>
-                <p className="text-3xl font-bold rlm-gradient-text">{profile.level}</p>
+            <div className="rlm-card p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-bold text-white flex items-center gap-2">
+                  <FaBolt className="text-yellow-400" /> Heti kihívások
+                </h2>
+                <span className="text-xs text-gray-500">
+                  {resetDays != null ? `Reset: ${resetDays} nap` : ''}
+                </span>
               </div>
-              <div className="w-40">
-                <div className="flex justify-between text-xs text-gray-400 mb-1">
-                  <span>{xpProgress.current} XP</span>
-                  <span>{xpProgress.required} XP</span>
+              {weekly ? (
+                <div className="space-y-2">
+                  {weekly.challenges.slice(0, 3).map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.03]">
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                        c.done ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-gray-500'
+                      }`}>
+                        {c.done ? <FaCheck className="w-3 h-3" /> : <FaBolt className="w-3 h-3" />}
+                      </span>
+                      <p className={`flex-1 text-sm ${c.done ? 'text-gray-500 line-through' : 'text-gray-200'}`}>{c.title}</p>
+                      <span className="text-xs text-white/45">+{c.xp} XP</span>
+                    </div>
+                  ))}
+                  <Link href="/dashboard/weekly" className="block pt-2 text-center text-sm text-white/50 hover:text-white">
+                    {weeklyLeft > 0 ? `${weekly.completed}/${weekly.total} kész · nyisd meg a packed` : 'Heti pack kész'}
+                  </Link>
                 </div>
-                <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(xpProgress.current / xpProgress.required) * 100}%` }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                    className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"
-                  />
-                </div>
+              ) : (
+                <Link href="/dashboard/weekly" className="text-sm text-gray-400 hover:text-white">Heti küldetések megnyitása</Link>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rlm-card p-5">
+              <h2 className="font-bold text-white mb-4">Statisztikáid</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Replay elemzés', value: sheets.length },
+                  { label: 'Aréna node', value: `${arenaDone}/${MONTHLY_ARENA_NODES}` },
+                  { label: 'Havi kredit', value: profile.coachingCredits },
+                  { label: 'Extra replay', value: profile.extraReplayCredits },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl bg-white/[0.03] p-3">
+                    <p className="text-xs text-gray-500">{s.label}</p>
+                    <p className="text-xl font-bold text-white mt-1">{s.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rlm-card p-5">
+              <h2 className="font-bold text-white mb-4">Gyors elérés</h2>
+              <div className="space-y-1">
+                {[
+                  { href: '/dashboard/profile?book=1', icon: FaUpload, label: 'Új replay feltöltése', sub: 'Kreditből elemzés Zolitól' },
+                  { href: '/dashboard/learn', icon: FaSearch, label: 'Kurzus keresése', sub: `${tutorialCount} tutoriál elérhető` },
+                  { href: '/dashboard/arena', icon: FaProjectDiagram, label: 'Aréna', sub: 'Dribble és Aerial fa' },
+                  { href: '/dashboard/community', icon: FaUsers, label: 'Közösségi replayek', sub: 'RLM+ feed', plus: true },
+                ].map((item) => {
+                  const locked = Boolean(item.plus) && !plus && user?.role !== 'admin';
+                  return (
+                    <Link
+                      key={item.href}
+                      href={locked ? '#' : item.href}
+                      onClick={(e) => locked && e.preventDefault()}
+                      className={`flex items-center gap-3 p-2.5 rounded-xl ${locked ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/5'}`}
+                    >
+                      <item.icon className="h-4 w-4 text-white/60" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white">{item.label}</p>
+                        <p className="text-xs text-gray-500">{item.sub}</p>
+                      </div>
+                      {locked ? <FaLock className="w-3 h-3 text-gray-600" /> : <FaChevronRight className="w-3 h-3 text-gray-600" />}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </div>
-        </div>
-      </motion.div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={FaVideo} label="Replay elemzések" value={sheets.length} color="bg-gradient-to-br from-orange-500 to-red-500" />
-        <StatCard icon={FaProjectDiagram} label="Aréna haladás" value={`${completedArenaNodes}/${totalArenaNodes}`} color="bg-gradient-to-br from-green-500 to-emerald-500" />
-        <StatCard icon={FaCrown} label="Coaching kredit" value={profile.coachingCredits} color="bg-gradient-to-br from-yellow-500 to-amber-500" />
-        <StatCard icon={FaTrophy} label="Extra replay" value={profile.extraReplayCredits} color="bg-gradient-to-br from-blue-500 to-cyan-500" />
-      </div>
-
-      {/* Two-column content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: replay analyses */}
-        <div className="lg:col-span-2 space-y-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <FaVideo className="text-orange-400" /> Legutóbbi Replay Elemzés
-              </h2>
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-white">Kiemelt kurzusok</h2>
+              <Link href="/dashboard/learn" className="text-xs text-white/45 hover:text-white">Összes megtekintése</Link>
             </div>
-            {latestSheet ? (
-              <SheetCard sheet={latestSheet} featured />
-            ) : (
-              <div className="rlm-card p-8 text-center text-gray-400">
-                Még nincs replay elemzésed. A coaching után itt jelenik meg az első sheeted.
-              </div>
-            )}
-          </motion.div>
-
-          {pastSheets.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <h2 className="text-lg font-bold text-white mb-4">Korábbi Elemzések</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pastSheets.map((s) => <SheetCard key={s.id} sheet={s} />)}
-              </div>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Right: coaching, badges, activity */}
-        <div className="space-y-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
-            <CoachingCard />
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rlm-card p-6">
-            <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
-              <FaTrophy className="text-yellow-400" /> Profil Badge
-            </h2>
-            <p className="text-sm text-gray-400 mb-4">Válaszd ki melyik badge jelenjen meg a profilodon.</p>
-            <div className="grid grid-cols-3 gap-3">
-              {PROFILE_BADGES.map((badge) => {
-                const locked = profile.level < badge.requiredLevel;
-                const active = profile.selectedBadge === badge.id;
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {featured.map((c) => {
+                const prog = profile.courseProgress.find((p) => p.courseId === c.id)?.progress || 0;
                 return (
-                  <button
-                    key={badge.id}
-                    disabled={locked}
-                    onClick={() => selectBadge(badge.id)}
-                    className={`relative aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 border transition-all ${
-                      active ? 'border-orange-500 bg-orange-500/10' : 'border-white/10 bg-white/[0.02] hover:border-white/20'
-                    } ${locked ? 'opacity-40 cursor-not-allowed' : ''}`}
-                    title={locked ? `Level ${badge.requiredLevel} szükséges` : badge.name}
-                  >
-                    <badge.icon className={`w-6 h-6 ${active ? 'text-orange-400' : 'text-gray-300'}`} />
-                    <span className="text-[10px] text-gray-400">{badge.name}</span>
-                    {locked && <span className="absolute top-1 right-1 text-[9px] text-gray-500">Lv{badge.requiredLevel}</span>}
-                  </button>
+                  <Link key={c.id} href="/dashboard/learn" className="rlm-card rlm-card-hover overflow-hidden block">
+                    <div className="relative aspect-[16/9]">
+                      <Image src={c.image} alt={c.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
+                    </div>
+                    <div className="p-3">
+                      <p className="text-sm font-semibold text-white line-clamp-1">{c.title}</p>
+                      <p className="text-xs text-gray-500 mt-1">{c.lessons.length} lecke · {c.rankRange}</p>
+                      {prog > 0 && (
+                        <div className="h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+                          <div className="h-full bg-white" style={{ width: `${prog}%` }} />
+                        </div>
+                      )}
+                    </div>
+                  </Link>
                 );
               })}
             </div>
-          </motion.div>
+          </div>
+        </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="rlm-card p-6">
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <FaStar className="text-orange-400" /> Legutóbbi Aktivitás
-            </h2>
-            {profile.notifications.length > 0 ? (
+        <aside className="space-y-4">
+          <div className="rlm-card p-5">
+            <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">Aktuális rang</p>
+            <p className="text-xl font-bold text-white">{profile.rank || 'Nincs beállítva'}</p>
+            <p className="text-sm text-gray-500 mt-1">Szint {profile.level}</p>
+            <Link href="/dashboard/profile" className="mt-4 inline-block text-xs text-white/45 hover:text-white">Profil és rang</Link>
+          </div>
+
+          <div className="rlm-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs uppercase tracking-wider text-gray-500">Aktív előfizetés</p>
+              <Link href="/#pricing" className="text-xs text-white/45 hover:text-white">Csomag kezelése</Link>
+            </div>
+            <p className="text-lg font-bold text-white">{plus ? 'RLM+' : 'RLM'}</p>
+            <p className="text-sm text-gray-400">{plus ? '7.990 Ft / hó' : '1.990 Ft / hó'}</p>
+            <div className="mt-4 space-y-2 text-sm">
+              <div className="flex justify-between text-gray-400">
+                <span>Havi replay kredit</span>
+                <span className="text-white">{profile.coachingCredits}</span>
+              </div>
+              <div className="flex justify-between text-gray-400">
+                <span>Extra replay</span>
+                <span className="text-white">{profile.extraReplayCredits}</span>
+              </div>
+              <div className="flex justify-between text-gray-400">
+                <span>Függő beküldés</span>
+                <span className="text-white">{pendingSubs}</span>
+              </div>
+            </div>
+            {!plus && (
+              <p className="text-[11px] text-gray-500 mt-3">
+                Extra replay {EXTRA_REPLAY_PRICE.toLocaleString('hu-HU')} Ft — RLM+ kell hozzá.
+              </p>
+            )}
+          </div>
+
+          <div className="rlm-card p-5">
+            <p className="text-xs uppercase tracking-wider text-gray-500 mb-3">Legutóbbi aktivitásod</p>
+            {profile.notifications.length === 0 ? (
+              <p className="text-sm text-gray-500">Még nincs aktivitásod.</p>
+            ) : (
               <div className="space-y-3">
-                {profile.notifications.slice(0, 5).map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`flex items-start gap-3 p-3 rounded-xl ${
-                      notification.read ? 'bg-white/5' : 'bg-orange-500/10 border border-orange-500/20'
-                    }`}
-                  >
-                    <FaCheckCircle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                      notification.type === 'success' ? 'text-green-400' :
-                      notification.type === 'warning' ? 'text-yellow-400' :
-                      notification.type === 'error' ? 'text-red-400' : 'text-blue-400'
-                    }`} />
-                    <div className="flex-1">
-                      <p className="text-white text-sm">{notification.message}</p>
-                      <p className="text-xs text-gray-500 mt-1">{new Date(notification.createdAt).toLocaleDateString('hu-HU')}</p>
+                {profile.notifications.slice(0, 5).map((n) => (
+                  <div key={n.id} className="flex gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FF6A2B]" />
+                    <div>
+                      <p className="text-sm text-gray-200 leading-snug">{n.message}</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">{relativeTime(n.createdAt)}</p>
                     </div>
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+
+          <div className="rlm-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs uppercase tracking-wider text-gray-500">Leaderboard</p>
+              {board?.unlocked && (
+                <Link href="/dashboard/leaderboard" className="text-xs text-white/45 hover:text-white">Teljes lista</Link>
+              )}
+            </div>
+            {!board?.unlocked ? (
+              <p className="text-sm text-gray-500 flex items-center gap-2">
+                <FaLock className="w-3 h-3" /> {profile.features.leaderboardUnlockThreshold} tagnál nyílik.
+              </p>
             ) : (
-              <div className="text-center py-8 text-gray-400 text-sm">
-                <p>Még nincs aktivitásod. Kezdd el az Aréna kihívásokat!</p>
+              <div className="space-y-2">
+                {(board.top || []).map((row) => (
+                  <Link
+                    key={row.id}
+                    href={`/dashboard/player/${row.id}`}
+                    className="flex items-center gap-2 text-sm hover:bg-white/5 rounded-lg px-1 py-1"
+                  >
+                    <span className="w-5 text-gray-500 text-xs">{row.position}</span>
+                    <span className="flex-1 text-white truncate">{row.name}</span>
+                    <span className="text-xs text-white/70">{row.score}</span>
+                  </Link>
+                ))}
+                {board.me && board.me.position > 3 && (
+                  <div className="flex items-center gap-2 text-sm border-t border-white/10 pt-2 mt-2 px-1">
+                    <span className="w-5 text-gray-500 text-xs">{board.me.position}</span>
+                    <span className="flex-1 text-white truncate">{board.me.name}</span>
+                    <span className="text-xs text-white/70">{board.me.score}</span>
+                  </div>
+                )}
               </div>
             )}
-          </motion.div>
-        </div>
+          </div>
+        </aside>
       </div>
     </div>
   );

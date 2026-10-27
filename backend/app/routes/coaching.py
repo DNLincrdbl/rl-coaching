@@ -4,15 +4,26 @@ import os
 from flask import Blueprint, abort, current_app, jsonify, request, send_from_directory
 from werkzeug.utils import secure_filename
 
-from ..extensions import db
-from ..models import Notification, ReplaySubmission
-from ..utils import allowed_video, current_user, login_required, save_video
+from ..extensions import db, limiter
+from ..utils import (
+    EXTRA_REPLAY_PRICE_HUF,
+    VIDEO_NAME_RE,
+    allowed_video,
+    current_user,
+    login_required,
+    notify_user,
+    sanitize_user_text,
+    save_video,
+    verify_video_signature,
+)
 
 bp = Blueprint("coaching", __name__, url_prefix="/api/coaching")
 
 
 @bp.post("/submit-replay")
 @login_required
+@limiter.limit("8 per minute")
+@limiter.limit("20 per hour")
 def submit_replay():
     """User uploads a replay video for the coach (admin) to analyse.
 
@@ -20,12 +31,12 @@ def submit_replay():
     credit first, otherwise a monthly coaching credit.
     """
     user = current_user()
-    if user.subscription_tier == "basic":
-        return jsonify({"error": "Az Alap tagság nem tartalmaz coachingot. Válts PRO-ra."}), 403
+    if not user.is_rlm_plus:
+        return jsonify({"error": "A replay elemzés az RLM+ csomag része."}), 403
     if user.coaching_credits <= 0 and user.extra_replay_credits <= 0:
         return jsonify({"error": "Nincs elérhető kredited. Vegyél extra replay elemzést."}), 402
 
-    note = (request.form.get("note") or "").strip()
+    note = sanitize_user_text(request.form.get("note"), 2000)
     use_discord = str(request.form.get("useDiscord", "true")).lower() in {"1", "true", "yes", "on"}
 
     video = request.files.get("video")
@@ -34,40 +45,42 @@ def submit_replay():
     if not allowed_video(video.filename):
         return jsonify({"error": "Nem támogatott videóformátum. Használj mp4, webm vagy mov fájlt."}), 400
 
-    filename = save_video(video)
+    try:
+        filename = save_video(video)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
 
-    # Consume a credit (extra first).
     if user.extra_replay_credits > 0:
         user.extra_replay_credits -= 1
     else:
         user.coaching_credits -= 1
     user.discord_coaching = use_discord
 
-    submission = ReplaySubmission(
+    from ..models import ReplaySubmission
+
+    db.session.add(ReplaySubmission(
         user_id=user.id,
         video_filename=filename,
-        note=note[:2000],
-    )
-    db.session.add(submission)
-    db.session.add(Notification(
-        user_id=user.id,
-        message="Replay beküldve! Hamarosan megkapod a részletes elemzést.",
-        type="success",
+        note=note,
     ))
+    notify_user(
+        user,
+        "Replay beküldve! Az elemzés 72 órán belül elkészül.",
+        "success",
+        email_subject="RLM — replay beérkezett",
+    )
     db.session.commit()
-    return jsonify({"user": user.to_profile()})
+    return jsonify({"user": user.to_profile(), "etaHours": 72})
 
 
 @bp.get("/videos/<path:filename>")
+@limiter.limit("120 per minute")
 def serve_video(filename: str):
-    """Serve an uploaded replay video (supports HTTP range requests for seeking).
-
-    Filenames are unguessable UUIDs, so this is served without auth to keep the
-    HTML5 <video> element (which cannot send auth headers) simple.
-    """
     safe = secure_filename(filename)
-    if not safe:
+    if not VIDEO_NAME_RE.match(safe):
         abort(404)
+    if not verify_video_signature(safe, request.args.get("e") or "", request.args.get("s") or ""):
+        abort(403)
     directory = current_app.config["UPLOAD_FOLDER"]
     if not os.path.isfile(os.path.join(directory, safe)):
         abort(404)
@@ -78,13 +91,14 @@ def serve_video(filename: str):
 @login_required
 def purchase_replay():
     user = current_user()
-    if user.subscription_tier != "pro":
-        return jsonify({"error": "Csak PRO tagok vásárolhatnak extra replay elemzést."}), 403
+    if not user.is_rlm_plus:
+        return jsonify({"error": "Csak RLM+ tagok vásárolhatnak extra replay elemzést."}), 403
     user.extra_replay_credits += 1
-    db.session.add(Notification(
-        user_id=user.id,
-        message="Extra replay elemzés hozzáadva a fiókodhoz (4.990 Ft).",
-        type="success",
-    ))
+    notify_user(
+        user,
+        f"Extra replay elemzés hozzáadva a fiókodhoz ({EXTRA_REPLAY_PRICE_HUF:,} Ft).".replace(",", "."),
+        "success",
+        email_subject="RLM — extra replay kredit",
+    )
     db.session.commit()
     return jsonify({"user": user.to_profile()})
